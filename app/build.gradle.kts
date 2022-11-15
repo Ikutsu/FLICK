@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.ikuzMirel.flick"
-    compileSdk = 32
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "com.ikuzMirel.flick"
         minSdk = 25
-        targetSdk = 32
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 
@@ -53,12 +53,22 @@ android {
 
 dependencies {
 
+    // Android
     implementation (AndroidX.core.ktx)
     implementation (AndroidX.lifecycle.runtime.ktx)
     implementation (AndroidX.activity.compose)
+
+    // Compose
     implementation (AndroidX.compose.ui)
+    implementation (AndroidX.compose.ui.tooling)
     implementation (AndroidX.compose.ui.toolingPreview)
+    implementation (AndroidX.compose.foundation)
+    implementation (AndroidX.compose.runtime)
+    implementation (AndroidX.compose.animation)
     implementation (AndroidX.compose.material3)
+
+    implementation (Google.accompanist.systemUiController)
+
     testImplementation (Testing.junit4)
     androidTestImplementation (AndroidX.test.ext.junit)
     androidTestImplementation (AndroidX.test.espresso.core)
