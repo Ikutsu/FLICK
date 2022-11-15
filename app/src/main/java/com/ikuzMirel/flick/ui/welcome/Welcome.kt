@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ikuzMirel.flick.R
 import com.ikuzMirel.flick.ui.theme.FLICKTheme
+import com.ikuzMirel.flick.ui.theme.cocogooseBold
 import com.ikuzMirel.flick.ui.theme.robotoCondensed
 
 @Preview (showBackground = true)
@@ -55,9 +56,9 @@ fun Home(){
                 )
                 Text(
                     text = "FLICK",
-                    fontSize = 128.sp,
+                    fontSize = 108.sp,
                     color = MaterialTheme.colorScheme.onBackground,
-                    fontFamily = robotoCondensed
+                    fontFamily = cocogooseBold
                 )
                 Spacer(
                     modifier = Modifier

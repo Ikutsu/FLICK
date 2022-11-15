@@ -6,3 +6,4 @@ import androidx.compose.ui.text.font.FontWeight
 import com.ikuzMirel.flick.R
 
 val robotoCondensed = FontFamily(Font(R.font.roboto_condensed_regular, FontWeight.Normal))
+val cocogooseBold = FontFamily(Font(R.font.cocogoose, FontWeight.Bold))
