@@ -1,4 +1,4 @@
-package com.ikuzMirel.flick.utils.icons
+package com.ikuzMirel.flick.ui.components.icons
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.ui.graphics.*
