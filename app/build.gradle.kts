@@ -3,6 +3,7 @@ import de.fayard.refreshVersions.core.versionFor
 plugins {
     id ("com.android.application")
     id ("org.jetbrains.kotlin.android")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -67,6 +68,9 @@ dependencies {
     implementation (AndroidX.compose.animation)
     implementation (AndroidX.compose.material3)
     implementation (AndroidX.compose.material.icons.extended)
+
+    implementation (Google.android.playServices.maps)
+    implementation (Google.android.maps.compose)
 
     implementation (Google.accompanist.systemUiController)
 
