@@ -72,6 +72,8 @@ dependencies {
     implementation (Google.android.playServices.maps)
     implementation (Google.android.maps.compose)
 
+    implementation (COIL.compose)
+
     implementation (Google.accompanist.systemUiController)
 
     testImplementation (Testing.junit4)
