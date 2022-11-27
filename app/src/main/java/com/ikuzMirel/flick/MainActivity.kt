@@ -14,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.ikuzMirel.flick.ui.login.Login
+import com.ikuzMirel.flick.ui.sighUp.SignUp
 import com.ikuzMirel.flick.ui.theme.FLICKTheme
 import com.ikuzMirel.flick.ui.theme.Gray80
 import com.ikuzMirel.flick.ui.theme.Purple10
@@ -28,12 +30,12 @@ class MainActivity : ComponentActivity() {
                 val useDarkIcons = !isSystemInDarkTheme()
                 val darkTheme = when{
                     isSystemInDarkTheme() -> Gray80
-                    else -> Purple10
+                    else -> Color.White
                 }
                 SideEffect {
                     systemUiController.setSystemBarsColor(darkTheme, darkIcons = useDarkIcons)
                 }
-                Home()
+                SignUp()
             }
         }
     }
