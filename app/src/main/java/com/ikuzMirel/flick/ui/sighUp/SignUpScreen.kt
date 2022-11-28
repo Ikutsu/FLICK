@@ -24,15 +24,16 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ikuzMirel.flick.R
-import com.ikuzMirel.flick.ui.theme.*
 import com.ikuzMirel.flick.ui.components.icons.KeyOutline
 import com.ikuzMirel.flick.ui.components.textFields.IconHintTextField
 import com.ikuzMirel.flick.ui.components.topAppBars.NavOnlyTopBar
+import com.ikuzMirel.flick.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUp() {
     val focusManager = LocalFocusManager.current
+    val scrollState = rememberScrollState()
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -50,6 +51,7 @@ fun SignUp() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .verticalScroll(scrollState)
         ) {
             Spacer(modifier = Modifier.height(24.dp))
             IconTitle(

@@ -11,3 +11,4 @@ val cocogooseSemiBold = FontFamily(Font(R.font.cocogoose_semilight, FontWeight.S
 val cocogooseRegular = FontFamily(Font(R.font.cocogoose_light, FontWeight.Normal))
 val cocogooseSemiLight = FontFamily(Font(R.font.cocogoose_semilight, FontWeight.ExtraLight))
 val cocogooseLight = FontFamily(Font(R.font.cocogoose_light, FontWeight.Thin))
+val museoRegular = FontFamily(Font(R.font.museosans_500, FontWeight.W500))
