@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ikuzMirel.flick.ui.login.Login
+import com.ikuzMirel.flick.ui.map.MapScreen
 import com.ikuzMirel.flick.ui.sighUp.SignUp
 import com.ikuzMirel.flick.ui.theme.FLICKTheme
 import com.ikuzMirel.flick.ui.theme.Gray80
@@ -35,7 +36,7 @@ class MainActivity : ComponentActivity() {
                 SideEffect {
                     systemUiController.setSystemBarsColor(darkTheme, darkIcons = useDarkIcons)
                 }
-                SignUp()
+                MapScreen()
             }
         }
     }
