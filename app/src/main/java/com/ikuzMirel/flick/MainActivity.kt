@@ -17,6 +17,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ikuzMirel.flick.ui.login.Login
 import com.ikuzMirel.flick.ui.map.MapScreen
 import com.ikuzMirel.flick.ui.sighUp.SignUp
+import com.ikuzMirel.flick.ui.story.Story
 import com.ikuzMirel.flick.ui.theme.FLICKTheme
 import com.ikuzMirel.flick.ui.theme.Gray80
 import com.ikuzMirel.flick.ui.theme.Purple10
@@ -36,7 +37,7 @@ class MainActivity : ComponentActivity() {
                 SideEffect {
                     systemUiController.setSystemBarsColor(darkTheme, darkIcons = useDarkIcons)
                 }
-                MapScreen()
+                Story()
             }
         }
     }
