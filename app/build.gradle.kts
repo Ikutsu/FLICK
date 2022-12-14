@@ -66,6 +66,7 @@ dependencies {
     implementation (AndroidX.compose.runtime)
     implementation (AndroidX.compose.animation)
     implementation (AndroidX.compose.material3)
+    implementation (AndroidX.compose.material.icons.extended)
 
     implementation (Google.accompanist.systemUiController)
 
