@@ -16,17 +16,6 @@ import androidx.compose.ui.unit.sp
 import com.ikuzMirel.flick.R
 import com.ikuzMirel.flick.ui.theme.FLICKTheme
 import com.ikuzMirel.flick.ui.theme.cocogooseBold
-import com.ikuzMirel.flick.ui.theme.robotoCondensed
-
-@Preview (showBackground = true)
-@Composable
-fun Preview(){
-    FLICKTheme(
-        darkTheme = true
-    ) {
-        Home()
-    }
-}
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
