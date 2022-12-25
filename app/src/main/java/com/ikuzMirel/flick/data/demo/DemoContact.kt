@@ -1,29 +1,31 @@
-package com.ikuzMirel.flick.ui.contact
+package com.ikuzMirel.flick.ui.mainContent.contact
+
+import com.ikuzMirel.flick.data.model.ContactModel
 
 
 val contactList = listOf(
-    FriendModel(
+    ContactModel(
         status = 1,
         name = "Mirel",
         latestMessage = "HEELLOOOOO",
         notification = 1
     ),
 
-    FriendModel(
+    ContactModel(
         status = 3,
         name = "Zhuoxuan",
         latestMessage = "Du!",
         notification = 214
     ),
 
-    FriendModel(
+    ContactModel(
         status = 0,
         name = "Simon",
         latestMessage = "Kallops",
         notification = 2
     ),
 
-    FriendModel(
+    ContactModel(
         status = 2,
         name = "Vincen",
         latestMessage = "jag heter vincent >:(",

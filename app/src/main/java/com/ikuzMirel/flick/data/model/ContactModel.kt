@@ -1,6 +1,6 @@
-package com.ikuzMirel.flick.ui.contact
+package com.ikuzMirel.flick.data.model
 
-data class FriendModel(
+data class ContactModel(
 //    val avatar: ,
     val status: Int,
     val name: String,

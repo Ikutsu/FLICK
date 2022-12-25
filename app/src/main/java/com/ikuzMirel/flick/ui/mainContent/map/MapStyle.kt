@@ -1,4 +1,4 @@
-package com.ikuzMirel.flick.ui.map
+package com.ikuzMirel.flick.ui.mainContent.map
 
 object MapStyle {
     val dayMap = """
