@@ -75,6 +75,7 @@ dependencies {
     implementation (COIL.compose)
 
     implementation (Google.accompanist.systemUiController)
+    implementation (Google.accompanist.pager)
 
     testImplementation (Testing.junit4)
     androidTestImplementation (AndroidX.test.ext.junit)

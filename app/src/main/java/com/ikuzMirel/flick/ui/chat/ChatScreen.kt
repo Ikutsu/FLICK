@@ -1,4 +1,4 @@
-package com.ikuzMirel.flick.ui.chatDetail
+package com.ikuzMirel.flick.ui.chat
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.*
@@ -10,25 +10,19 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.AttachFile
-import androidx.compose.material.icons.filled.Send
-import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -36,7 +30,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ikuzMirel.flick.R
@@ -46,11 +39,10 @@ import com.ikuzMirel.flick.ui.components.icons.SendOutlined
 import com.ikuzMirel.flick.ui.extension.noRippleClickable
 import com.ikuzMirel.flick.ui.theme.*
 
-// TODO: Find a better name
 // TODO: Hardcoded data source, change when viewModel is created
 // TODO: Unconfirmed font, current: Museo sans 
 @Composable
-fun ChatDetail() {
+fun Chat() {
     val focusManager = LocalFocusManager.current
     val scrollState = rememberLazyListState()
     Surface(
