@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
@@ -131,7 +132,7 @@ fun Message(
             ) {
                 Text(
                     text = massage.content,
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = Color.White,
                     modifier = Modifier
                         .padding(
                             start = 14.dp,
@@ -181,7 +182,7 @@ fun Message(
             ) {
                 Text(
                     text = massage.content,
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = Color.White,
                     modifier = Modifier
                         .padding(
                             start = 14.dp,
@@ -315,7 +316,7 @@ fun UserInputField() {
                     modifier = Modifier
                         .padding(vertical = 4.dp, horizontal = 5.dp)
                         .size(40.dp)
-                        .background(Gray80, RoundedCornerShape(12.dp)),
+                        .background(MaterialTheme.colorScheme.background, RoundedCornerShape(12.dp)),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
