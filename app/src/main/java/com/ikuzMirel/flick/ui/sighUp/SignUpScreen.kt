@@ -18,8 +18,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,6 +31,7 @@ import com.ikuzMirel.flick.ui.components.icons.KeyOutline
 import com.ikuzMirel.flick.ui.components.textFields.IconHintTextField
 import com.ikuzMirel.flick.ui.components.topAppBars.NavOnlyTopBar
 import com.ikuzMirel.flick.ui.theme.*
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,7 +81,7 @@ fun IconTitle(
     ) {
         Image(
             painter = painterResource(
-                id = when{
+                id = when {
                     isSystemInDarkTheme() -> R.drawable.flick_4x
                     else -> R.drawable.flick_dark
                 }
@@ -120,7 +124,8 @@ private fun Content() {
         focusRequester = emailFocusRequester,
         keyboardActions = KeyboardActions(onNext = {
             usernameFocusRequester.requestFocus()
-        })
+        }),
+        visualTransformation = VisualTransformation.None
     )
     Spacer(modifier = Modifier.height(24.dp))
     IconHintTextField(
@@ -133,7 +138,8 @@ private fun Content() {
         focusRequester = usernameFocusRequester,
         keyboardActions = KeyboardActions(onNext = {
             passwordFocusRequester.requestFocus()
-        })
+        }),
+        visualTransformation = VisualTransformation.None
     )
     Spacer(modifier = Modifier.height(24.dp))
     IconHintTextField(
@@ -146,20 +152,30 @@ private fun Content() {
         focusRequester = passwordFocusRequester,
         keyboardActions = KeyboardActions(onNext = {
             confirmPassFocusRequester.requestFocus()
-        })
+        }),
+        visualTransformation = PasswordVisualTransformation(),
+        textStyle = TextStyle(
+            color = MaterialTheme.colorScheme.onBackground,
+            letterSpacing = 2.sp
+        )
     )
     Spacer(modifier = Modifier.height(24.dp))
     IconHintTextField(
         leadingIcon = Icons.Outlined.KeyOutline,
         gotFocusIcon = Icons.Filled.Key,
-        placeholder = "password",
+        placeholder = "Confirm Password",
         imeAction = ImeAction.Done,
         value = confirmPassValue.value,
         onValueChange = { confirmPassValue.value = it },
         focusRequester = confirmPassFocusRequester,
         keyboardActions = KeyboardActions(onDone = {
             focusManager.clearFocus()
-        })
+        }),
+        visualTransformation = PasswordVisualTransformation(),
+        textStyle = TextStyle(
+            color = MaterialTheme.colorScheme.onBackground,
+            letterSpacing = 2.sp
+        )
     )
 }
 
@@ -174,7 +190,7 @@ private fun BottomText() {
     ){
         Text(
             text = "Already have an account? ",
-            fontSize = 16.sp,
+            fontSize = 12.sp,
             color = Gray50,
             fontFamily = cocogooseLight,
         )
@@ -183,7 +199,7 @@ private fun BottomText() {
             color = Purple60,
             modifier = Modifier
                 .clickable {  },
-            fontSize = 16.sp,
+            fontSize = 12.sp,
             fontFamily = cocogooseSemiLight,
             textDecoration = TextDecoration.Underline
         )

@@ -24,6 +24,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.ikuzMirel.flick.ui.theme.Gray30
 import com.ikuzMirel.flick.ui.theme.Gray70
@@ -38,7 +39,12 @@ fun IconHintTextField(
     value: TextFieldValue,
     onValueChange: (value : TextFieldValue) -> Unit,
     focusRequester: FocusRequester,
-    keyboardActions: KeyboardActions
+    keyboardActions: KeyboardActions,
+    visualTransformation: VisualTransformation,
+    textStyle: TextStyle = TextStyle(
+        color = MaterialTheme.colorScheme.onBackground,
+        fontFamily = cocogooseLight
+    )
 ) {
     var icon by remember { mutableStateOf(leadingIcon) }
     var hint by remember { mutableStateOf(placeholder) }
@@ -88,10 +94,8 @@ fun IconHintTextField(
                 ),
                 keyboardActions = keyboardActions,
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
-                textStyle = TextStyle(
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontFamily = cocogooseLight
-                ),
+                textStyle = textStyle,
+                visualTransformation = visualTransformation,
                 decorationBox = { innerTextField ->
                     Box {
                         if (value.text.isEmpty()) {

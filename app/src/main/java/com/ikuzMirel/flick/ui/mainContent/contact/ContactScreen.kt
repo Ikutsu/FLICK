@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,8 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ikuzMirel.flick.R
 import com.ikuzMirel.flick.data.model.ContactModel
-import com.ikuzMirel.flick.ui.theme.cocogooseBold
-import com.ikuzMirel.flick.ui.theme.cocogooseLight
+import com.ikuzMirel.flick.ui.theme.*
 
 @Composable
 fun Contact() {
@@ -67,10 +67,10 @@ fun ContactListItem(
                     color = when (
                         contactModel.status
                     ){
-                        0 -> Color.Green
-                        1 -> Color.Yellow
+                        0 -> Green70
+                        1 -> Amber40
                         2 -> Color.Gray
-                        3 -> Color.Red
+                        3 -> Red70
                         else -> Color.Transparent
                     },
                     style = Stroke(5F)
@@ -97,7 +97,7 @@ fun ContactListItem(
                 text = contactModel.name,
                 fontSize = 16.sp,
                 fontFamily = cocogooseBold,
-                color = Color.White
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Text(

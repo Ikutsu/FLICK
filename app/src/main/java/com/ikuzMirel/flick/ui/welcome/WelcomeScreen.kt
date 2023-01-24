@@ -2,6 +2,7 @@ package com.ikuzMirel.flick.ui.welcome
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -26,7 +27,12 @@ fun Home(){
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(id = R.drawable.flick_4x),
+                painter = painterResource(
+                    id = when {
+                        isSystemInDarkTheme() -> R.drawable.flick_4x
+                        else -> R.drawable.flick_dark
+                    }
+                ),
                 contentDescription = "",
                 alpha = 0.3f,
                 contentScale = ContentScale.FillHeight,
@@ -43,7 +49,7 @@ fun Home(){
                 )
                 Text(
                     text = "FLICK",
-                    fontSize = 108.sp,
+                    fontSize = 100.sp,
                     color = MaterialTheme.colorScheme.onBackground,
                     fontFamily = cocogooseBold
                 )

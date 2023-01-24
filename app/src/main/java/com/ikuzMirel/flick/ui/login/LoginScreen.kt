@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,8 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -84,7 +88,8 @@ private fun Content() {
         focusRequester = usernameFocusRequester,
         keyboardActions = KeyboardActions(onNext = {
             passwordFocusRequester.requestFocus()
-        })
+        }),
+        visualTransformation = VisualTransformation.None
     )
     Spacer(modifier = Modifier.height(24.dp))
     IconHintTextField(
@@ -97,7 +102,12 @@ private fun Content() {
         focusRequester = passwordFocusRequester,
         keyboardActions = KeyboardActions(onDone = {
             focusManager.clearFocus()
-        })
+        }),
+        visualTransformation = PasswordVisualTransformation(),
+        textStyle = TextStyle(
+            color = MaterialTheme.colorScheme.onBackground,
+            letterSpacing = 2.sp
+        )
     )
 }
 
@@ -112,7 +122,7 @@ private fun BottomText() {
     ){
         Text(
             text = "Don’t have an account? ",
-            fontSize = 16.sp,
+            fontSize = 12.sp,
             color = Gray50,
             fontFamily = cocogooseLight,
         )
@@ -121,7 +131,7 @@ private fun BottomText() {
             color = Purple60,
             modifier = Modifier
                 .clickable {  },
-            fontSize = 16.sp,
+            fontSize = 12.sp,
             fontFamily = cocogooseSemiLight,
             textDecoration = TextDecoration.Underline
         )
