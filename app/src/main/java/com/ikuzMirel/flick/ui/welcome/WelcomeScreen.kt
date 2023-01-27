@@ -14,12 +14,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ikuzMirel.flick.R
+import com.ikuzMirel.flick.ui.destinations.AuthenticationDestination
 import com.ikuzMirel.flick.ui.theme.cocogooseBold
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
+@RootNavGraph(start = true)
+@Destination
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Home(){
+fun Home(
+    navigator: DestinationsNavigator
+){
     Scaffold() {
         Box(
             modifier = Modifier
@@ -59,7 +67,9 @@ fun Home(){
                         .weight(1f)
                 )
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                              navigator.navigate(AuthenticationDestination)
+                    },
                     modifier = Modifier
                         .width(300.dp)
                         .height(52.dp),
