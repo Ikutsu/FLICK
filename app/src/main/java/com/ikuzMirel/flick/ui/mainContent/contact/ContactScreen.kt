@@ -3,6 +3,7 @@ package com.ikuzMirel.flick.ui.mainContent.contact
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,10 +23,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ikuzMirel.flick.R
 import com.ikuzMirel.flick.data.model.ContactModel
+import com.ikuzMirel.flick.ui.destinations.ChatDestination
 import com.ikuzMirel.flick.ui.theme.*
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @Composable
-fun Contact() {
+fun Contact(
+    navigator: DestinationsNavigator
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -33,7 +38,7 @@ fun Contact() {
     ) {
 
         items(contactList) {
-            ContactListItem(it)
+            ContactListItem(it, navigator)
         }
     }
 }
@@ -41,11 +46,13 @@ fun Contact() {
 // TODO: Image for avatar is temporary placeholder
 @Composable
 fun ContactListItem(
-    contactModel: ContactModel
+    contactModel: ContactModel,
+    navigator: DestinationsNavigator
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable {navigator.navigate(ChatDestination)},
 
         verticalAlignment = Alignment.CenterVertically
     ) {

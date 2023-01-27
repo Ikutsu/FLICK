@@ -7,9 +7,13 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.ikuzMirel.flick.ui.NavGraphs
+import com.ikuzMirel.flick.ui.chat.Chat
+import com.ikuzMirel.flick.ui.mainContent.MainContent
 import com.ikuzMirel.flick.ui.theme.FLICKTheme
 import com.ikuzMirel.flick.ui.theme.Gray80
 import com.ikuzMirel.flick.ui.welcome.Home
+import com.ramcosta.composedestinations.DestinationsNavHost
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +29,7 @@ class MainActivity : ComponentActivity() {
                 SideEffect {
                     systemUiController.setSystemBarsColor(darkTheme, darkIcons = useDarkIcons)
                 }
-                Home()
+                DestinationsNavHost(navGraph = NavGraphs.root)
             }
         }
     }

@@ -20,6 +20,8 @@ import com.google.accompanist.pager.rememberPagerState
 import com.ikuzMirel.flick.ui.mainContent.contact.Contact
 import com.ikuzMirel.flick.ui.mainContent.map.Map
 import com.ikuzMirel.flick.ui.mainContent.story.Feed
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 
 // TODO: Bad name
@@ -30,9 +32,12 @@ enum class Screens(val icon: ImageVector, val contentDescription: String) {
 }
 
 // TODO: Bad name
+@Destination
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun MainContent() {
+fun MainContent(
+    navigator: DestinationsNavigator
+) {
     val pagerState = rememberPagerState(initialPage = 1)
 
     Surface(
@@ -47,6 +52,7 @@ fun MainContent() {
                     .fillMaxSize()
                     .padding(bottom = 80.dp),
                 pagerState = pagerState,
+                navigator
             )
             UseTopAppBar()
             UseNavigationBar(
@@ -60,7 +66,11 @@ fun MainContent() {
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-private fun Content(modifier: Modifier, pagerState: PagerState) {
+private fun Content(
+    modifier: Modifier,
+    pagerState: PagerState,
+    navigator: DestinationsNavigator
+) {
     HorizontalPager(
         state = pagerState,
         count = Screens.values().size,
@@ -72,7 +82,7 @@ private fun Content(modifier: Modifier, pagerState: PagerState) {
     ) { index ->
         when (index) {
             0 -> Map()
-            1 -> Contact()
+            1 -> Contact(navigator)
             2 -> Feed()
         }
     }

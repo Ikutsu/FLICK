@@ -1,4 +1,4 @@
-package com.ikuzMirel.flick.ui.sighUp
+package com.ikuzMirel.flick.ui.authentication
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -30,12 +30,20 @@ import com.ikuzMirel.flick.R
 import com.ikuzMirel.flick.ui.components.icons.KeyOutline
 import com.ikuzMirel.flick.ui.components.textFields.IconHintTextField
 import com.ikuzMirel.flick.ui.components.topAppBars.NavOnlyTopBar
+import com.ikuzMirel.flick.ui.destinations.*
 import com.ikuzMirel.flick.ui.theme.*
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-
+@Destination
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUp() {
+fun Authentication(
+    navigator: DestinationsNavigator
+) {
+    var account by remember {
+        mutableStateOf(false)
+    }
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
     Scaffold(
@@ -47,9 +55,9 @@ fun SignUp() {
                 })
             },
         topBar = { NavOnlyTopBar(
-            navOnClick = {}
+            navOnClick = {navigator.popBackStack()}
         ) },
-        bottomBar = { BottomText() }
+        bottomBar = { BottomText(account, action = { account = !account }) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -59,15 +67,25 @@ fun SignUp() {
         ) {
             Spacer(modifier = Modifier.height(24.dp))
             IconTitle(
-                title = "Sign Up"
+                title = when (account){
+                    true -> "Log in"
+                    false -> "Sign up"
+                }
             )
             Spacer(modifier = Modifier.height(24.dp))
-            Content()
+            when (account){
+               true -> LoginContent()
+                false -> SignUpContent()
+            }
             Spacer(modifier = Modifier.height(24.dp))
-            BasicButton(onClick = {}, text = "Sign Up")
+            BasicButton(onClick = {
+                navigator.navigate(MainContentDestination)
+            }, text = when (account){
+                true -> "Log in"
+                false -> "Sign up"
+            })
         }
     }
-
 }
 
 @Composable
@@ -101,7 +119,7 @@ fun IconTitle(
 }
 
 @Composable
-private fun Content() {
+private fun SignUpContent() {
 
     val emailValue = remember { mutableStateOf(TextFieldValue("")) }
     val userValue = remember { mutableStateOf(TextFieldValue("")) }
@@ -180,7 +198,10 @@ private fun Content() {
 }
 
 @Composable
-private fun BottomText() {
+private fun BottomText(
+    account: Boolean,
+    action: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -189,16 +210,22 @@ private fun BottomText() {
         verticalAlignment = Alignment.CenterVertically
     ){
         Text(
-            text = "Already have an account? ",
+            text =  when (account){
+                true -> "Don't have an account? "
+                false -> "Already have an account? "
+            },
             fontSize = 12.sp,
             color = Gray50,
             fontFamily = cocogooseLight,
         )
         Text(
-            text = "Log in",
+            text =  when (account){
+                true -> "Sign up"
+                false -> "Log in"
+            },
             color = Purple60,
             modifier = Modifier
-                .clickable {  },
+                .clickable { action() },
             fontSize = 12.sp,
             fontFamily = cocogooseSemiLight,
             textDecoration = TextDecoration.Underline
@@ -229,4 +256,46 @@ fun BasicButton(
             fontFamily = cocogooseBold
         )
     }
+}
+
+@Composable
+private fun LoginContent() {
+    val userValue = remember { mutableStateOf(TextFieldValue("")) }
+    val passwordValue = remember { mutableStateOf(TextFieldValue("")) }
+
+    val usernameFocusRequester = remember { FocusRequester() }
+    val passwordFocusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+
+    IconHintTextField(
+        leadingIcon = Icons.Outlined.Person,
+        gotFocusIcon = Icons.Filled.Person,
+        placeholder = "Username",
+        imeAction = ImeAction.Next,
+        value = userValue.value,
+        onValueChange = { userValue.value = it },
+        focusRequester = usernameFocusRequester,
+        keyboardActions = KeyboardActions(onNext = {
+            passwordFocusRequester.requestFocus()
+        }),
+        visualTransformation = VisualTransformation.None
+    )
+    Spacer(modifier = Modifier.height(24.dp))
+    IconHintTextField(
+        leadingIcon = Icons.Outlined.KeyOutline,
+        gotFocusIcon = Icons.Filled.Key,
+        placeholder = "Password",
+        imeAction = ImeAction.Done,
+        value = passwordValue.value,
+        onValueChange = { passwordValue.value = it },
+        focusRequester = passwordFocusRequester,
+        keyboardActions = KeyboardActions(onDone = {
+            focusManager.clearFocus()
+        }),
+        visualTransformation = PasswordVisualTransformation(),
+        textStyle = TextStyle(
+            color = MaterialTheme.colorScheme.onBackground,
+            letterSpacing = 2.sp
+        )
+    )
 }
