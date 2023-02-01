@@ -4,6 +4,7 @@ plugins {
     id ("com.android.application")
     id ("org.jetbrains.kotlin.android")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    id("com.google.devtools.ksp") version "1.7.21-1.0.8"
 }
 
 android {
@@ -50,6 +51,14 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    applicationVariants.all {
+        kotlin.sourceSets {
+            getByName(name) {
+                kotlin.srcDir("build/generated/ksp/$name/kotlin")
+            }
+        }
+    }
 }
 
 dependencies {
@@ -83,4 +92,8 @@ dependencies {
     androidTestImplementation (AndroidX.compose.ui.testJunit4)
     debugImplementation (AndroidX.compose.ui.tooling)
     debugImplementation (AndroidX.compose.ui.testManifest)
+
+    //Compose
+    implementation(Libs.compose_destinations_animations_core)
+    ksp (Libs.compose_destinations_ksp)
 }

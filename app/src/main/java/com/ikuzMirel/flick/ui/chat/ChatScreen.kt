@@ -39,11 +39,16 @@ import com.ikuzMirel.flick.data.model.MessageModel
 import com.ikuzMirel.flick.ui.components.icons.SendOutlined
 import com.ikuzMirel.flick.ui.extension.noRippleClickable
 import com.ikuzMirel.flick.ui.theme.*
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 // TODO: Hardcoded data source, change when viewModel is created
-// TODO: Unconfirmed font, current: Museo sans 
+// TODO: Unconfirmed font, current: Museo sans
+@Destination
 @Composable
-fun Chat() {
+fun Chat(
+    navigator: DestinationsNavigator
+) {
     val focusManager = LocalFocusManager.current
     val scrollState = rememberLazyListState()
     Surface(
@@ -76,8 +81,7 @@ fun Chat() {
                 )
                 UserInputField()
             }
-            TitleAvatarTopBar(
-            )
+            TitleAvatarTopBar(navigator)
         }
 
     }
@@ -212,11 +216,12 @@ fun Message(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TitleAvatarTopBar(
+    navigator: DestinationsNavigator
 ) {
     CenterAlignedTopAppBar(
         navigationIcon = {
             IconButton(
-                onClick = { /*TODO*/ }
+                onClick = { navigator.popBackStack() }
             ) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
@@ -230,7 +235,7 @@ fun TitleAvatarTopBar(
         ) },
         actions = {
             IconButton(
-                onClick = { /*TODO*/ }
+                onClick = { navigator.popBackStack() }
             ) {
                 Icon(
                     imageVector = Icons.Filled.AccountCircle,
