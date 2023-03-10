@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.FLICK" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.FLICK" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/gray_80</item>
+        <item name="android:statusBarColor">@color/gray_80</item>
+        <item name="android:navigationBarColor">@color/gray_80</item>
+    </style>
+    
+    <style name="Theme.CustomSplash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/gray_80</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/flick_splash</item>
+        <item name="windowSplashScreenAnimationDuration">300</item>
+        <item name="postSplashScreenTheme">@style/Theme.FLICK</item>
+    </style>
 </resources>

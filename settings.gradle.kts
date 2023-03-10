@@ -12,10 +12,6 @@ plugins {
     id("de.fayard.refreshVersions") version "0.51.0"
 }
 
-refreshVersions {
-    enableBuildSrcLibs()
-}
-
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {

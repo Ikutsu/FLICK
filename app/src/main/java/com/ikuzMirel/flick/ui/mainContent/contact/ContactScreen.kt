@@ -12,6 +12,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,8 +21,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.ikuzMirel.flick.R
 import com.ikuzMirel.flick.data.model.ContactModel
 import com.ikuzMirel.flick.ui.destinations.ChatDestination
@@ -29,8 +33,11 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @Composable
 fun Contact(
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
+    viewModel: ContactViewModel = hiltViewModel()
 ) {
+    val userId by viewModel.userId.collectAsState()
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -39,6 +46,16 @@ fun Contact(
 
         items(contactList) {
             ContactListItem(it, navigator)
+        }
+        item {
+            Text(
+                text = userId,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                color = Color.White.copy(alpha = 0.5f),
+                fontSize = 12.sp,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
@@ -52,7 +69,7 @@ fun ContactListItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {navigator.navigate(ChatDestination)},
+            .clickable { navigator.navigate(ChatDestination) },
 
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -139,6 +156,7 @@ fun ContactListItem(
                     },
                     fontSize = 12.sp,
                     color = Color.White,
+                    fontFamily = museoRegular,
                     modifier = Modifier
                         .padding(horizontal = 4.dp)
                 )

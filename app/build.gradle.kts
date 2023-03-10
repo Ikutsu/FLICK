@@ -1,11 +1,17 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import de.fayard.refreshVersions.core.versionFor
 
+@Suppress("UnstableApiUsage")
 plugins {
     id ("com.android.application")
     id ("org.jetbrains.kotlin.android")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
-    id("com.google.devtools.ksp") version "1.7.21-1.0.8"
+    id("com.google.devtools.ksp") version "1.8.0-1.0.9"
+    kotlin ("kapt")
+    id("com.google.dagger.hilt.android")
 }
+
+val localProperties = gradleLocalProperties(rootDir)
 
 android {
     namespace = "com.ikuzMirel.flick"
@@ -31,8 +37,25 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+        }
+        debug {
+            isDebuggable = true
+        }
+        create("Home") {
+            initWith(getByName("debug"))
+            buildConfigField("String", "ServerUrl", localProperties["server.home"].toString())
+        }
+        create("Work") {
+            initWith(getByName("debug"))
+            buildConfigField("String", "ServerUrl", localProperties["server.work"].toString())
+        }
+        create("Prod") {
+            initWith(getByName("debug"))
+            buildConfigField("String", "ServerUrl", localProperties["server.prod"].toString())
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -61,12 +84,17 @@ android {
     }
 }
 
+kapt {
+    correctErrorTypes = true
+}
+
 dependencies {
 
     // Android
     implementation (AndroidX.core.ktx)
     implementation (AndroidX.lifecycle.runtime.ktx)
     implementation (AndroidX.activity.compose)
+    implementation (AndroidX.core.splashscreen)
 
     // Compose
     implementation (AndroidX.compose.ui)
@@ -78,22 +106,40 @@ dependencies {
     implementation (AndroidX.compose.material3)
     implementation (AndroidX.compose.material.icons.extended)
 
+    //Google map
     implementation (Google.android.playServices.maps)
     implementation (Google.android.maps.compose)
 
+    //Coil
     implementation (COIL.compose)
 
+    //Accompanist
     implementation (Google.accompanist.systemUiController)
     implementation (Google.accompanist.pager)
 
+    //Hilt dagger
+    implementation (Google.dagger.hilt.android)
+    implementation("androidx.core:core-ktx:1.9.0")
+    kapt (Google.dagger.hilt.compiler)
+    kapt (AndroidX.hilt.compiler)
+    implementation (AndroidX.hilt.navigationCompose)
+
+    //Retrofit
+    implementation (Square.retrofit2.retrofit)
+    implementation (Square.retrofit2.converter.moshi)
+
+    //Compose destinations
+    implementation(libs.animations.core)
+    ksp (libs.ksp)
+
+    //DataStore
+    implementation (AndroidX.dataStore.preferences)
+
+    //Testing
     testImplementation (Testing.junit4)
     androidTestImplementation (AndroidX.test.ext.junit)
     androidTestImplementation (AndroidX.test.espresso.core)
     androidTestImplementation (AndroidX.compose.ui.testJunit4)
     debugImplementation (AndroidX.compose.ui.tooling)
     debugImplementation (AndroidX.compose.ui.testManifest)
-
-    //Compose
-    implementation(Libs.compose_destinations_animations_core)
-    ksp (Libs.compose_destinations_ksp)
 }
