@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.sp
 import com.ikuzMirel.flick.R
 import com.ikuzMirel.flick.ui.theme.cocogooseLight
 
-// TODO: Find a better name for the screen
 // TODO: Hardcoded data source, change when viewModel is created
 
 @Composable

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.CustomSplash" parent="Theme.SplashScreen">
+        <item name="android:windowSplashScreenBackground">@color/gray_80</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/flick_splash</item>
+        <item name="android:windowSplashScreenAnimationDuration">50000</item>
+        <item name="postSplashScreenTheme">@style/Theme.FLICK</item>
+    </style>
+</resources>

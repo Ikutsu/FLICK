@@ -17,6 +17,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
+import com.ikuzMirel.flick.ui.destinations.SettingDestination
 import com.ikuzMirel.flick.ui.mainContent.contact.Contact
 import com.ikuzMirel.flick.ui.mainContent.map.Map
 import com.ikuzMirel.flick.ui.mainContent.story.Feed
@@ -54,7 +55,7 @@ fun MainContent(
                 pagerState = pagerState,
                 navigator
             )
-            UseTopAppBar()
+            UseTopAppBar(navigator)
             UseNavigationBar(
                 modifier = Modifier.align(Alignment.BottomCenter),
                 pagerState = pagerState
@@ -88,9 +89,11 @@ private fun Content(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UseTopAppBar() {
+fun UseTopAppBar(
+    navigator: DestinationsNavigator
+) {
     TopAppBar(
         title = {},
         navigationIcon = {
@@ -102,7 +105,7 @@ fun UseTopAppBar() {
             }
         },
         actions = {
-            IconButton(onClick = { /* doSomething() */ }) {
+            IconButton(onClick = { navigator.navigate(SettingDestination) }) {
                 Icon(
                     imageVector = Icons.Outlined.Settings,
                     contentDescription = "Settings"
