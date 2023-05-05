@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- TODO: Remove usesCleartextTraffic -->
     <application
@@ -37,7 +38,20 @@
         </activity>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="${mapAPI}" />
-    </application>
+            android:value="${mapAPI}">
+        </meta-data>
+        <receiver
+            android:name=".receiver.BootCompletedReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <service
+            android:name=".data.service.NetworkService"
+            android:exported="false"
+            android:directBootAware="true"
 
+            />
+    </application>
 </manifest>

@@ -2,7 +2,8 @@ package com.ikuzMirel.flick.ui.setting
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ikuzMirel.flick.data.user.UserPreferencesRepository
+import com.ikuzMirel.flick.data.repositories.PreferencesRepository
+import com.ikuzMirel.flick.data.remote.websocket.WebSocketService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +13,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingViewModel @Inject constructor(
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val webSocketService: WebSocketService,
+    private val preferencesRepository: PreferencesRepository
 ): ViewModel(){
 
     private val _isReady: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -20,7 +22,8 @@ class SettingViewModel @Inject constructor(
 
     fun logout() {
         viewModelScope.launch {
-            userPreferencesRepository.clear()
+            webSocketService.disconnectFromSocket()
+            preferencesRepository.clear()
             _isReady.value = true
         }
     }

@@ -1,9 +1,13 @@
 package com.ikuzMirel.flick.ui.mainContent
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -13,10 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
 import com.ikuzMirel.flick.ui.destinations.SettingDestination
 import com.ikuzMirel.flick.ui.mainContent.contact.Contact
 import com.ikuzMirel.flick.ui.mainContent.map.Map
@@ -33,8 +33,8 @@ enum class Screens(val icon: ImageVector, val contentDescription: String) {
 }
 
 // TODO: Bad name
+@OptIn(ExperimentalFoundationApi::class)
 @Destination
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MainContent(
     navigator: DestinationsNavigator
@@ -65,7 +65,7 @@ fun MainContent(
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Content(
     modifier: Modifier,
@@ -74,7 +74,7 @@ private fun Content(
 ) {
     HorizontalPager(
         state = pagerState,
-        count = Screens.values().size,
+        pageCount = Screens.values().size,
         modifier = modifier,
         userScrollEnabled = when (pagerState.currentPage) {
             0 -> false
@@ -118,7 +118,7 @@ fun UseTopAppBar(
     )
 }
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UseNavigationBar(modifier: Modifier, pagerState: PagerState) {
     val scope = rememberCoroutineScope()

@@ -9,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,13 +20,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ikuzMirel.flick.R
-import com.ikuzMirel.flick.data.auth.AuthResult
+import com.ikuzMirel.flick.data.utils.ResponseResult
 import com.ikuzMirel.flick.ui.authentication.AuthViewModel
 import com.ikuzMirel.flick.ui.destinations.AuthenticationDestination
+import com.ikuzMirel.flick.ui.destinations.WelcomeDestination
 import com.ikuzMirel.flick.ui.theme.cocogooseBold
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.popUpTo
 
 @Destination
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -37,7 +37,7 @@ fun Welcome(
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val state = viewModel.state
+    val state by viewModel.state
 
     LaunchedEffect(state, context) {
         viewModel.authResult.collect { result ->
@@ -63,7 +63,7 @@ fun Welcome(
 //                        }
 //                    }
 //                }
-                is AuthResult.Error -> {
+                is ResponseResult.Error -> {
                     Toast.makeText(
                         context,
                         "Error",
@@ -116,6 +116,7 @@ fun Welcome(
                 )
                 Button(
                     onClick = {
+                        navigator.popBackStack()
                         navigator.navigate(AuthenticationDestination())
                     },
                     modifier = Modifier

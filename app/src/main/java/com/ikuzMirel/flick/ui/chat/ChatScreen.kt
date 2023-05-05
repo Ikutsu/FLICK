@@ -16,9 +16,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -26,16 +24,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.ikuzMirel.flick.R
-import com.ikuzMirel.flick.data.demo.massageList
-import com.ikuzMirel.flick.data.model.MessageModel
+import com.ikuzMirel.flick.domain.model.Message
 import com.ikuzMirel.flick.ui.components.icons.SendOutlined
 import com.ikuzMirel.flick.ui.extension.noRippleClickable
 import com.ikuzMirel.flick.ui.theme.*
@@ -47,10 +47,33 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Destination
 @Composable
 fun Chat(
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
+    viewModel: ChatViewModel = hiltViewModel(),
+    username: String,
+    userId: String,
+    collectionId: String,
 ) {
     val focusManager = LocalFocusManager.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val scrollState = rememberLazyListState()
+    val state by viewModel.state
+
+    LaunchedEffect(Unit) {
+        viewModel.getChatMessages(collectionId)
+    }
+
+    DisposableEffect(key1 = lifecycleOwner){
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_START){
+                viewModel.receiveMessage(collectionId)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     Surface(
         modifier = Modifier
             .windowInsetsPadding(
@@ -74,24 +97,25 @@ fun Chat(
                     .fillMaxSize()
             ) {
                 Content(
-                    messages = massageList,
+                    messages = state.messages,
                     modifier = Modifier
                         .weight(1f),
-                    scrollState = scrollState
+                    scrollState = scrollState,
+                    state = state
                 )
-                UserInputField()
+                UserInputField(viewModel, state, collectionId, userId)
             }
-            TitleAvatarTopBar(navigator)
+            TitleAvatarTopBar(navigator, username, userId)
         }
-
     }
 }
 
 @Composable
 private fun Content(
-    messages: List<MessageModel>,
+    messages: List<Message>,
     modifier: Modifier,
-    scrollState: LazyListState
+    scrollState: LazyListState,
+    state: ChatUIState
 ) {
     Box(modifier = modifier) {
         LazyColumn(
@@ -103,7 +127,7 @@ private fun Content(
         ) {
             items(messages) {
                 Message(
-                    userMe = "Xuan",
+                    userMe = state.senderId,
                     massage = it
                 )
             }
@@ -115,7 +139,7 @@ private fun Content(
 @Composable
 fun Message(
     userMe: String,
-    massage: MessageModel
+    massage: Message
 ) {
     val isOwnMessage = massage.user == userMe
     val (showTime, setShowTime) = remember {
@@ -216,7 +240,9 @@ fun Message(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TitleAvatarTopBar(
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
+    username: String,
+    userId: String,
 ) {
     CenterAlignedTopAppBar(
         navigationIcon = {
@@ -230,12 +256,12 @@ fun TitleAvatarTopBar(
             }
         },
         title = { Text(
-            text = "Mirel",
+            text = username,
             fontFamily = museoRegular
         ) },
         actions = {
             IconButton(
-                onClick = { navigator.popBackStack() }
+                onClick = { /*TODO*/ }
             ) {
                 Icon(
                     imageVector = Icons.Filled.AccountCircle,
@@ -247,10 +273,12 @@ fun TitleAvatarTopBar(
 }
 
 @Composable
-fun UserInputField() {
-    val value = remember {
-        mutableStateOf(TextFieldValue(""))
-    }
+fun UserInputField(
+    viewModel: ChatViewModel,
+    state: ChatUIState,
+    collectionId: String,
+    receiverId: String
+) {
     Row(
         modifier = Modifier
             .padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 16.dp)
@@ -285,8 +313,8 @@ fun UserInputField() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 BasicTextField(
-                    value = value.value,
-                    onValueChange = { value.value = it },
+                    value = state.message,
+                    onValueChange = { viewModel.onEvent(ChatUIEvent.MassageChanged(it)) },
                     modifier = Modifier
                         .weight(1f)
                         .padding(start = 16.dp, end = 8.dp),
@@ -303,7 +331,7 @@ fun UserInputField() {
                     ),
                     decorationBox = { innerTextField ->
                         Box {
-                            if (value.value.text.isEmpty()) {
+                            if (state.message.isEmpty()) {
                                 Text(
                                     text = "Message",
                                     color = MaterialTheme.colorScheme.onBackground,
@@ -321,7 +349,14 @@ fun UserInputField() {
                     modifier = Modifier
                         .padding(vertical = 4.dp, horizontal = 5.dp)
                         .size(40.dp)
-                        .background(MaterialTheme.colorScheme.background, RoundedCornerShape(12.dp)),
+                        .background(MaterialTheme.colorScheme.background, RoundedCornerShape(12.dp))
+                        .clickable {
+                            viewModel.sendMessage(
+                                state.message,
+                                collectionId,
+                                receiverId
+                            )
+                        },
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
