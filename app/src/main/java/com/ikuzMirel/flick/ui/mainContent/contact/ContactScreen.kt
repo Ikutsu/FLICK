@@ -12,7 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,8 +25,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ikuzMirel.flick.R
-import com.ikuzMirel.flick.data.model.ContactModel
+import com.ikuzMirel.flick.domain.model.Friend
 import com.ikuzMirel.flick.ui.destinations.ChatDestination
 import com.ikuzMirel.flick.ui.theme.*
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -36,7 +37,12 @@ fun Contact(
     navigator: DestinationsNavigator,
     viewModel: ContactViewModel = hiltViewModel()
 ) {
-    val userId by viewModel.userId.collectAsState()
+    val userId by viewModel.userId.collectAsStateWithLifecycle()
+    val state by viewModel.state
+
+    LaunchedEffect(Unit){
+        viewModel.getFriends()
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -44,7 +50,7 @@ fun Contact(
             .padding(top = 64.dp)
     ) {
 
-        items(contactList) {
+        items(state.friends) {
             ContactListItem(it, navigator)
         }
         item {
@@ -63,14 +69,13 @@ fun Contact(
 // TODO: Image for avatar is temporary placeholder
 @Composable
 fun ContactListItem(
-    contactModel: ContactModel,
+    friend: Friend,
     navigator: DestinationsNavigator
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { navigator.navigate(ChatDestination) },
-
+            .clickable { navigator.navigate(ChatDestination(friend.name, friend.userId, friend.collectionId)) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         
@@ -89,7 +94,7 @@ fun ContactListItem(
             ) {
                 drawCircle(
                     color = when (
-                        contactModel.status
+                        friend.status
                     ){
                         0 -> Green70
                         1 -> Amber40
@@ -118,21 +123,21 @@ fun ContactListItem(
                 )
         ) {
             Text(
-                text = contactModel.name,
+                text = friend.name,
                 fontSize = 16.sp,
-                fontFamily = cocogooseBold,
+                fontFamily = museoRegular,
                 color = MaterialTheme.colorScheme.onBackground
             )
 
             Text(
-                text = contactModel.latestMessage,
+                text = friend.latestMessage,
                 fontSize = 12.sp,
-                fontFamily = cocogooseLight,
+                fontFamily = museoRegular,
                 color = Color.Gray
             )
         }
 
-        if (contactModel.notification != 0) {
+        if (friend.notification != 0) {
             Column(
                 modifier = Modifier
                     .padding(
@@ -141,7 +146,7 @@ fun ContactListItem(
                     .background(
                         color = Color.Red,
                         shape = when {
-                            contactModel.notification > 9 -> RoundedCornerShape(50)
+                            friend.notification > 9 -> RoundedCornerShape(50)
                             else -> RoundedCornerShape(100)
                         }
                     ),
@@ -151,8 +156,8 @@ fun ContactListItem(
             ) {
                 Text(
                     text = when {
-                        contactModel.notification > 99 -> "99+"
-                        else -> contactModel.notification.toString()
+                        friend.notification > 99 -> "99+"
+                        else -> friend.notification.toString()
                     },
                     fontSize = 12.sp,
                     color = Color.White,

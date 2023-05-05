@@ -1,9 +1,9 @@
 package com.ikuzMirel.flick.ui.authentication
 
 sealed class AuthUIEvent{
-    data class SignInUsernameChanged(val username: String) : AuthUIEvent()
-    data class SignInPasswordChanged(val password: String) : AuthUIEvent()
-    object SignIn : AuthUIEvent()
+    data class LoginUsernameChanged(val username: String) : AuthUIEvent()
+    data class LoginPasswordChanged(val password: String) : AuthUIEvent()
+    object Login : AuthUIEvent()
 
     data class SignUpEmailChanged(val email: String) : AuthUIEvent()
     data class SignUpUsernameChanged(val username: String) : AuthUIEvent()

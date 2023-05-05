@@ -6,9 +6,10 @@ plugins {
     id ("com.android.application")
     id ("org.jetbrains.kotlin.android")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
-    id("com.google.devtools.ksp") version "1.8.0-1.0.9"
+    id("com.google.devtools.ksp") version "1.8.10-1.0.9"
     kotlin ("kapt")
     id("com.google.dagger.hilt.android")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 val localProperties = gradleLocalProperties(rootDir)
@@ -44,15 +45,15 @@ android {
         }
         create("Home") {
             initWith(getByName("debug"))
-            buildConfigField("String", "ServerUrl", localProperties["server.home"].toString())
+            buildConfigField("String", "ServerIP", localProperties["server.home"].toString())
         }
         create("Work") {
             initWith(getByName("debug"))
-            buildConfigField("String", "ServerUrl", localProperties["server.work"].toString())
+            buildConfigField("String", "ServerIP", localProperties["server.work"].toString())
         }
         create("Prod") {
             initWith(getByName("debug"))
-            buildConfigField("String", "ServerUrl", localProperties["server.prod"].toString())
+            buildConfigField("String", "ServerIP", localProperties["server.prod"].toString())
         }
     }
 
@@ -93,6 +94,8 @@ dependencies {
     // Android
     implementation (AndroidX.core.ktx)
     implementation (AndroidX.lifecycle.runtime.ktx)
+    implementation (AndroidX.lifecycle.viewModelKtx)
+    implementation (AndroidX.lifecycle.runtime.compose)
     implementation (AndroidX.activity.compose)
     implementation (AndroidX.core.splashscreen)
 
@@ -115,18 +118,27 @@ dependencies {
 
     //Accompanist
     implementation (Google.accompanist.systemUiController)
-    implementation (Google.accompanist.pager)
 
     //Hilt dagger
     implementation (Google.dagger.hilt.android)
-    implementation("androidx.core:core-ktx:1.9.0")
     kapt (Google.dagger.hilt.compiler)
     kapt (AndroidX.hilt.compiler)
     implementation (AndroidX.hilt.navigationCompose)
 
-    //Retrofit
-    implementation (Square.retrofit2.retrofit)
-    implementation (Square.retrofit2.converter.moshi)
+    //Ktor
+    implementation (Ktor.client.core)
+    implementation (Ktor.client.cio)
+    implementation (Ktor.plugins.websockets)
+    implementation (Ktor.client.serialization)
+    implementation (Ktor.client.logging)
+    implementation (Ktor.client.contentNegotiation)
+    implementation (Ktor.plugins.serialization.kotlinx.json)
+
+    //Room
+    implementation (AndroidX.room.runtime)
+    annotationProcessor (AndroidX.room.compiler)
+    ksp (AndroidX.room.compiler)
+    implementation (AndroidX.room.ktx)
 
     //Compose destinations
     implementation(libs.animations.core)

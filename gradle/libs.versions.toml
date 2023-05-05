@@ -20,11 +20,13 @@ secrets-gradle-plugin = "com.google.android.libraries.mapsplatform.secrets-gradl
 
 org-jacoco-ant = "org.jacoco:org.jacoco.ant:0.8.7"
 
-animations-core = "io.github.raamcosta.compose-destinations:animations-core:1.8.35-beta"
+animations-core = "io.github.raamcosta.compose-destinations:animations-core:1.8.38-beta"
 
-symbol-processing = "com.google.devtools.ksp:symbol-processing:1.8.0-1.0.8"
+symbol-processing = "com.google.devtools.ksp:symbol-processing:1.8.10-1.0.8"
 
-ksp = "io.github.raamcosta.compose-destinations:ksp:1.8.35-beta"
+ksp = "io.github.raamcosta.compose-destinations:ksp:1.8.38-beta"
 
 symbol-processing-api = "com.google.devtools.ksp:symbol-processing-api:1.8.10-1.0.9"
 ##                                                                 ⬆ :1.8.20-Beta-1.0.9"
+##                                                                 ⬆ :1.8.20-RC-1.0.9"
+##                                                                 ⬆ :1.8.20-RC2-1.0.9"

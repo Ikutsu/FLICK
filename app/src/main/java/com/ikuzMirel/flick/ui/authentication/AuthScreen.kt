@@ -1,5 +1,6 @@
 package com.ikuzMirel.flick.ui.authentication
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -32,7 +33,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ikuzMirel.flick.R
-import com.ikuzMirel.flick.data.auth.AuthResult
+import com.ikuzMirel.flick.data.service.NetworkService
+import com.ikuzMirel.flick.data.utils.LOGIN_CONFLICTED
+import com.ikuzMirel.flick.data.utils.ResponseResult
+import com.ikuzMirel.flick.data.utils.USERNAME_CONFLICTED
 import com.ikuzMirel.flick.ui.components.icons.KeyOutline
 import com.ikuzMirel.flick.ui.components.textFields.IconHintTextField
 import com.ikuzMirel.flick.ui.destinations.*
@@ -40,7 +44,6 @@ import com.ikuzMirel.flick.ui.extension.noRippleClickable
 import com.ikuzMirel.flick.ui.theme.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.navigation.popUpTo
 
 @Destination
 @Composable
@@ -50,7 +53,7 @@ fun Authentication(
     _isLogin: Boolean = false
 ) {
     var isLogin by remember { mutableStateOf(_isLogin) }
-    val state = viewModel.state
+    val state by viewModel.state
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
@@ -92,26 +95,26 @@ fun Authentication(
 
     LaunchedEffect(state, context) {
         viewModel.authResult.collect { result ->
+            println("$result Auth")
             when (result) {
-                is AuthResult.Authenticated -> {
-                    navigator.navigate(MainContentDestination){
-                        popUpTo(WelcomeDestination.route) {
-                            inclusive = true
-                        }
+                is ResponseResult.Success -> {
+                    context.stopService(Intent(context, NetworkService::class.java))
+                    context.startService(Intent(context, NetworkService::class.java))
+                    navigator.navigate(MainContentDestination) {
                         popUpTo(AuthenticationDestination.route) {
                             inclusive = true
                         }
+                        navigator.clearBackStack(AuthenticationDestination)
                     }
-                    navigator.clearBackStack(AuthenticationDestination)
                 }
-                is AuthResult.SocketTimeoutException -> {
-                    Toast.makeText(
-                        context,
-                        "Connection timed out",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                else -> {
+                is ResponseResult.Error -> {
+                    if (result.errorMessage != LOGIN_CONFLICTED && result.errorMessage != USERNAME_CONFLICTED) {
+                        Toast.makeText(
+                            context,
+                            result.errorMessage,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         }
@@ -164,12 +167,12 @@ fun Authentication(
                     placeholder = "Username",
                     imeAction = ImeAction.Next,
                     value = when (isLogin) {
-                        true -> state.signInUsername
+                        true -> state.loginUsername
                         false -> state.signUpUsername
                     },
                     onValueChange = {
                         when (isLogin) {
-                            true -> viewModel.onEvent(AuthUIEvent.SignInUsernameChanged(it))
+                            true -> viewModel.onEvent(AuthUIEvent.LoginUsernameChanged(it))
                             false -> viewModel.onEvent(AuthUIEvent.SignUpUsernameChanged(it))
                         }
                     },
@@ -189,12 +192,12 @@ fun Authentication(
                         false -> ImeAction.Next
                     },
                     value = when (isLogin) {
-                        true -> state.signInPassword
+                        true -> state.LoginPassword
                         false -> state.signUpPassword
                     },
                     onValueChange = {
                         when (isLogin) {
-                            true -> viewModel.onEvent(AuthUIEvent.SignInPasswordChanged(it))
+                            true -> viewModel.onEvent(AuthUIEvent.LoginPasswordChanged(it))
                             false -> viewModel.onEvent(AuthUIEvent.SignUpPasswordChanged(it))
                         }
                     },
@@ -233,17 +236,19 @@ fun Authentication(
                 BasicButton(
                     onClick = {
                         focusManager.clearFocus()
+                        viewModel.clearError()
                         when (isLogin) {
-                        true -> viewModel.onEvent(AuthUIEvent.SignIn)
-                        false -> viewModel.onEvent(AuthUIEvent.SignUp)
-                    } },
+                            true -> viewModel.onEvent(AuthUIEvent.Login)
+                            false -> viewModel.onEvent(AuthUIEvent.SignUp)
+                        }
+                    },
                     text = when (isLogin) {
                         true -> "Log in"
                         false -> "Sign up"
                     },
                     enabled = when (isLogin) {
-                        true -> state.signInUsername.isNotBlank()
-                                && state.signInPassword.isNotBlank()
+                        true -> state.loginUsername.isNotBlank()
+                                && state.LoginPassword.isNotBlank()
                         false -> state.signUpUsername.isNotBlank()
                                 && state.signUpEmail.isNotBlank()
                                 && state.signUpPassword.isNotBlank()
@@ -360,6 +365,7 @@ private fun BottomText(
         }
     }
 }
+
 @Composable
 fun BasicButton(
     onClick: () -> Unit,
