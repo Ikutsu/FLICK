@@ -2,7 +2,7 @@ package com.ikuzMirel.flick.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-
+val Gray90 = Color(0xCC212121)
 val Gray80 = Color(0xFF1F2937)
 val Gray70 = Color(0xFF374151)
 val Gray50 = Color(0xFF6B7280)
