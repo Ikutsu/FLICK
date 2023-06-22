@@ -39,12 +39,17 @@ import com.ikuzMirel.flick.domain.model.Message
 import com.ikuzMirel.flick.ui.components.icons.SendOutlined
 import com.ikuzMirel.flick.ui.extension.noRippleClickable
 import com.ikuzMirel.flick.ui.theme.*
+import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-// TODO: Hardcoded data source, change when viewModel is created
-// TODO: Unconfirmed font, current: Museo sans
-@Destination
+@Destination(
+    deepLinks = [
+        DeepLink(
+            uriPattern = "https://flick.com/chat/{username}/{userId}/{collectionId}",
+        )
+    ]
+)
 @Composable
 fun Chat(
     navigator: DestinationsNavigator,
@@ -58,14 +63,10 @@ fun Chat(
     val scrollState = rememberLazyListState()
     val state by viewModel.state
 
-    LaunchedEffect(Unit) {
-        viewModel.getChatMessages(collectionId)
-    }
-
     DisposableEffect(key1 = lifecycleOwner){
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_START){
-                viewModel.receiveMessage(collectionId)
+                viewModel.getChatMessages(collectionId)
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -141,7 +142,7 @@ fun Message(
     userMe: String,
     massage: Message
 ) {
-    val isOwnMessage = massage.user == userMe
+    val isOwnMessage = massage.userId == userMe
     val (showTime, setShowTime) = remember {
         mutableStateOf(false)
     }
@@ -172,7 +173,7 @@ fun Message(
                 )
                 if (showTime) {
                     Text(
-                        text = massage.time,
+                        text = massage.timestamp,
                         color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 12.sp,
                         modifier = Modifier
@@ -222,7 +223,7 @@ fun Message(
                 )
                 if (showTime) {
                     Text(
-                        text = massage.time,
+                        text = massage.timestamp,
                         color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 12.sp,
                         modifier = Modifier

@@ -6,13 +6,13 @@ data class AuthUIState (
     val isInit : Boolean = false,
     val hasToken: Boolean = false,
 
-    val loginUsername: String = "test1231",
-    val LoginPassword: String = "Qwert1234",
+    val loginUsername: String = "",
+    val LoginPassword: String = "",
 
-    val signUpEmail: String = "qwe@gmail.com",
-    val signUpUsername: String = "test1231",
-    val signUpPassword: String = "Qwert1234",
-    val signUpConfirmPassword: String = "Qwert1234",
+    val signUpEmail: String = "",
+    val signUpUsername: String = "",
+    val signUpPassword: String = "",
+    val signUpConfirmPassword: String = "",
 
     val emailError: Boolean = false,
     val usernameError: Boolean = false,

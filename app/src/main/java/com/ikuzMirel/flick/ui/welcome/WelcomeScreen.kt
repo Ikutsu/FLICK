@@ -12,22 +12,20 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ikuzMirel.flick.R
-import com.ikuzMirel.flick.data.utils.ResponseResult
+import com.ikuzMirel.flick.data.response.BasicResponse
 import com.ikuzMirel.flick.ui.authentication.AuthViewModel
 import com.ikuzMirel.flick.ui.destinations.AuthenticationDestination
-import com.ikuzMirel.flick.ui.destinations.WelcomeDestination
-import com.ikuzMirel.flick.ui.theme.cocogooseBold
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.navigation.popUpTo
+
 
 @Destination
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -63,7 +61,7 @@ fun Welcome(
 //                        }
 //                    }
 //                }
-                is ResponseResult.Error -> {
+                is BasicResponse.Error -> {
                     Toast.makeText(
                         context,
                         "Error",
@@ -105,9 +103,9 @@ fun Welcome(
                 )
                 Text(
                     text = "FLICK",
-                    fontSize = 100.sp,
+                    fontSize = 128.sp,
                     color = MaterialTheme.colorScheme.onBackground,
-                    fontFamily = cocogooseBold
+                    fontWeight = FontWeight.Bold
                 )
                 Spacer(
                     modifier = Modifier
@@ -127,8 +125,6 @@ fun Welcome(
                     Text(
                         text = "Get Started",
                         fontSize = 18.sp,
-                        color = Color.White,
-                        fontFamily = cocogooseBold
                     )
                 }
                 Spacer(

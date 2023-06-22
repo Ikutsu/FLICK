@@ -1,11 +1,11 @@
 package com.ikuzMirel.flick.data.repositories
 
-import com.ikuzMirel.flick.data.dto.friendList.request.FriendListRequestDto
-import com.ikuzMirel.flick.data.dto.friendList.response.FriendListResponseDto
-import com.ikuzMirel.flick.data.dto.userData.request.UserDataRequestDto
-import com.ikuzMirel.flick.data.dto.userData.response.UserDataResponseDto
+import com.ikuzMirel.flick.data.model.UserData
 import com.ikuzMirel.flick.data.remote.user.UserRemote
-import com.ikuzMirel.flick.data.utils.ResponseResult
+import com.ikuzMirel.flick.data.requests.FriendListRequest
+import com.ikuzMirel.flick.data.requests.UserDataRequest
+import com.ikuzMirel.flick.data.response.BasicResponse
+import com.ikuzMirel.flick.data.response.FriendListResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -13,27 +13,27 @@ import javax.inject.Inject
 class UserRepositoryImpl @Inject constructor(
     private val remote: UserRemote
 ) : UserRepository {
-    override suspend fun getUserInfo(request: UserDataRequestDto): Flow<ResponseResult<UserDataResponseDto>> {
+    override suspend fun getUserInfo(request: UserDataRequest): Flow<BasicResponse<UserData>> {
         return flow {
             when (val response = remote.getUserInfo(request)) {
-                is ResponseResult.Error -> {
-                    emit(ResponseResult.error(response.errorMessage))
+                is BasicResponse.Error -> {
+                    emit(BasicResponse.Error(response.errorMessage))
                 }
-                is ResponseResult.Success -> {
-                    emit(ResponseResult.success(response.data))
+                is BasicResponse.Success -> {
+                    emit(BasicResponse.Success(response.data))
                 }
             }
         }
     }
 
-    override suspend fun gerUserFriends(request: FriendListRequestDto): Flow<ResponseResult<FriendListResponseDto>> {
+    override suspend fun gerUserFriends(request: FriendListRequest): Flow<BasicResponse<FriendListResponse>> {
         return flow {
             when (val response = remote.getUserFriends(request)) {
-                is ResponseResult.Error -> {
-                    emit(ResponseResult.error(response.errorMessage))
+                is BasicResponse.Error -> {
+                    emit(BasicResponse.Error(response.errorMessage))
                 }
-                is ResponseResult.Success -> {
-                    emit(ResponseResult.success(response.data))
+                is BasicResponse.Success -> {
+                    emit(BasicResponse.Success(response.data))
                 }
             }
         }

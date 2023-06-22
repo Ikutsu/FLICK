@@ -1,17 +1,29 @@
 package com.ikuzMirel.flick.data.remote.auth
 
 import android.util.Log
-import com.ikuzMirel.flick.data.dto.login.request.LoginRequestDto
-import com.ikuzMirel.flick.data.dto.login.response.LoginResponseDto
-import com.ikuzMirel.flick.data.dto.signup.request.SignupRequestDto
-import com.ikuzMirel.flick.data.utils.*
+import com.ikuzMirel.flick.data.constants.ENDPOINT_AUTH
+import com.ikuzMirel.flick.data.constants.ENDPOINT_LOGIN
+import com.ikuzMirel.flick.data.constants.ENDPOINT_REGISTER
+import com.ikuzMirel.flick.data.constants.LOGIN_CONFLICTED
+import com.ikuzMirel.flick.data.constants.NO_INTERNET_CONNECTION_ERROR
+import com.ikuzMirel.flick.data.constants.SOCKET_TIMEOUT_ERROR
+import com.ikuzMirel.flick.data.constants.UNAUTHENTICATED
+import com.ikuzMirel.flick.data.constants.UNKNOWN_ERROR
+import com.ikuzMirel.flick.data.constants.UNKNOWN_HTTP_ERROR
+import com.ikuzMirel.flick.data.constants.USERNAME_CONFLICTED
+import com.ikuzMirel.flick.data.model.AuthData
+import com.ikuzMirel.flick.data.requests.LoginRequest
+import com.ikuzMirel.flick.data.requests.SignupRequest
+import com.ikuzMirel.flick.data.response.BasicResponse
 import com.ikuzMirel.flick.utils.EXCEPTION_MESSAGE
 import com.ikuzMirel.flick.utils.NET_EXCEPTION_MESSAGE
 import com.ikuzMirel.flick.utils.TAG
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.plugins.*
-import io.ktor.client.request.*
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import javax.inject.Inject
@@ -19,98 +31,97 @@ import javax.inject.Inject
 class AuthRemoteImpl @Inject constructor(
     private val client: HttpClient
 ) : AuthRemote {
-    override suspend fun login(request: LoginRequestDto): ResponseResult<LoginResponseDto> {
+    override suspend fun login(request: LoginRequest): BasicResponse<AuthData> {
         return try {
             val response = client.post(ENDPOINT_LOGIN) {
                 setBody(request)
-            }
-            println(response.body<LoginResponseDto.Data>())
+            }   
             when (response.status.value) {
                 200 -> {
-                    ResponseResult.success(LoginResponseDto(data = response.body<LoginResponseDto.Data>()))
+                    BasicResponse.Success(response.body<AuthData>())
                 }
                 401 -> {
-                    ResponseResult.error(LoginResponseDto(error = UNAUTHENTICATED))
+                    BasicResponse.Error(UNAUTHENTICATED)
                 }
                 409 -> {
-                    ResponseResult.error(LoginResponseDto(error = LOGIN_CONFLICTED))
+                    BasicResponse.Error(LOGIN_CONFLICTED)
                 }
                 else -> {
                     Log.e(TAG, NET_EXCEPTION_MESSAGE + response.status.value + response.status.description)
-                    ResponseResult.error(LoginResponseDto(error = UNKNOWN_HTTP_ERROR))
+                    BasicResponse.Error(UNKNOWN_HTTP_ERROR)
                 }
             }
         } catch (e: ConnectException) {
             Log.e(TAG, EXCEPTION_MESSAGE + e.stackTraceToString())
-            ResponseResult.error(LoginResponseDto(error = NO_INTERNET_CONNECTION_ERROR))
+            BasicResponse.Error(NO_INTERNET_CONNECTION_ERROR)
         } catch (e: SocketTimeoutException) {
             Log.e(TAG, EXCEPTION_MESSAGE + e.stackTraceToString())
-            ResponseResult.error(LoginResponseDto(error = SOCKET_TIMEOUT_ERROR))
+            BasicResponse.Error(SOCKET_TIMEOUT_ERROR)
         } catch (e: Exception) {
             Log.e(TAG, EXCEPTION_MESSAGE + e.stackTraceToString())
-            ResponseResult.error(LoginResponseDto(error = UNKNOWN_ERROR))
+            BasicResponse.Error(UNKNOWN_ERROR)
         }
     }
 
-    override suspend fun signup(request: SignupRequestDto): ResponseResult<String> {
+    override suspend fun signup(request: SignupRequest): BasicResponse<String> {
         return try {
             val response = client.post(ENDPOINT_REGISTER) {
                 setBody(request)
             }
             when (response.status.value) {
                 200 -> {
-                    ResponseResult.success()
+                    BasicResponse.Success()
                 }
                 401 -> {
-                    ResponseResult.error(UNAUTHENTICATED)
+                    BasicResponse.Error(UNAUTHENTICATED)
                 }
                 409 -> {
-                    ResponseResult.error(USERNAME_CONFLICTED)
+                    BasicResponse.Error(USERNAME_CONFLICTED)
                 }
                 else -> {
                     Log.e(TAG, NET_EXCEPTION_MESSAGE + response.status.value + response.status.description)
-                    ResponseResult.error(UNKNOWN_HTTP_ERROR)
+                    BasicResponse.Error(UNKNOWN_HTTP_ERROR)
                 }
             }
         } catch (e: ConnectException) {
             Log.e(TAG, EXCEPTION_MESSAGE + e.stackTraceToString())
-            ResponseResult.error(NO_INTERNET_CONNECTION_ERROR)
+            BasicResponse.Error(NO_INTERNET_CONNECTION_ERROR)
         } catch (e: SocketTimeoutException) {
             Log.e(TAG, EXCEPTION_MESSAGE + e.stackTraceToString())
-            ResponseResult.error(SOCKET_TIMEOUT_ERROR)
+            BasicResponse.Error(SOCKET_TIMEOUT_ERROR)
         } catch (e: Exception) {
             Log.e(TAG, EXCEPTION_MESSAGE + e.stackTraceToString())
-            ResponseResult.error(UNKNOWN_ERROR)
+            BasicResponse.Error(UNKNOWN_ERROR)
         }
     }
 
-    override suspend fun authenticate(token: String): ResponseResult<String> {
+    override suspend fun authenticate(token: String): BasicResponse<String> {
         return try {
             val response = client.get(ENDPOINT_AUTH) {
                 bearerAuth(token)
             }
             when (response.status.value) {
                 200 -> {
-                    ResponseResult.success()
+                    BasicResponse.Success()
                 }
                 401 -> {
                     Log.e(TAG, "Token is invalid")
-                    ResponseResult.error(UNAUTHENTICATED)
+                    BasicResponse.Error(UNAUTHENTICATED)
                 }
                 else -> {
                     Log.e(TAG, NET_EXCEPTION_MESSAGE + response.status.value + response.status.description)
-                    ResponseResult.error(UNKNOWN_ERROR)
+                    BasicResponse.Error(UNKNOWN_ERROR)
                 }
             }
         } catch (e: ConnectException) {
             Log.e(TAG, EXCEPTION_MESSAGE + e.stackTraceToString())
-            ResponseResult.error(NO_INTERNET_CONNECTION_ERROR)
+            BasicResponse.Error(NO_INTERNET_CONNECTION_ERROR)
         } catch (e: SocketTimeoutException) {
             Log.e(TAG, EXCEPTION_MESSAGE + e.stackTraceToString())
-            ResponseResult.error(SOCKET_TIMEOUT_ERROR)
+            BasicResponse.Error(SOCKET_TIMEOUT_ERROR)
         } catch (e: Exception) {
             Log.e(TAG, EXCEPTION_MESSAGE + e.stackTraceToString())
-            ResponseResult.error(UNKNOWN_ERROR)
+            BasicResponse.Error(UNKNOWN_ERROR)
         }
     }
 }

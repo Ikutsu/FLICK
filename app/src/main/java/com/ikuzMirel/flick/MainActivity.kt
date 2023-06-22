@@ -6,24 +6,27 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.ikuzMirel.flick.data.remote.websocket.WebSocketService
+import com.ikuzMirel.flick.data.response.BasicResponse
 import com.ikuzMirel.flick.data.service.NetworkService
-import com.ikuzMirel.flick.data.utils.ResponseResult
 import com.ikuzMirel.flick.ui.NavGraphs
 import com.ikuzMirel.flick.ui.authentication.AuthViewModel
-import com.ikuzMirel.flick.ui.destinations.MainContentDestination
+import com.ikuzMirel.flick.ui.destinations.HomeDestination
 import com.ikuzMirel.flick.ui.destinations.WelcomeDestination
 import com.ikuzMirel.flick.ui.theme.FLICKTheme
 import com.ikuzMirel.flick.ui.theme.Gray80
 import com.ramcosta.composedestinations.DestinationsNavHost
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
@@ -53,10 +56,9 @@ class MainActivity : ComponentActivity() {
                         viewModel.authenticate()
                         viewModel.checkToken()
                         viewModel.authResult.collect {
-                            println("$it main")
                             isAuthenticated = when (it) {
-                                is ResponseResult.Success -> true
-                                is ResponseResult.Error -> false
+                                is BasicResponse.Success -> true
+                                is BasicResponse.Error -> false
                             }
                             keepOnScreenCondition = false
                         }
@@ -69,7 +71,7 @@ class MainActivity : ComponentActivity() {
                     DestinationsNavHost(
                         navGraph = NavGraphs.root,
                         navController = navController,
-                        startRoute = MainContentDestination
+                        startRoute = HomeDestination
                     )
                 } else {
                     DestinationsNavHost(

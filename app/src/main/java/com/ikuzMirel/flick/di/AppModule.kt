@@ -4,18 +4,17 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import com.ikuzMirel.flick.data.local.database.UserDatabase
 import com.ikuzMirel.flick.data.remote.auth.AuthRemote
 import com.ikuzMirel.flick.data.remote.auth.AuthRemoteImpl
 import com.ikuzMirel.flick.data.remote.chat.ChatRemote
 import com.ikuzMirel.flick.data.remote.chat.ChatRemoteImpl
 import com.ikuzMirel.flick.data.remote.user.UserRemote
 import com.ikuzMirel.flick.data.remote.user.UserRemoteImpl
-import com.ikuzMirel.flick.data.remote.websocket.WebSocketService
-import com.ikuzMirel.flick.data.remote.websocket.WebSocketServiceImpl
+import com.ikuzMirel.flick.data.remote.websocket.WebSocketApi
+import com.ikuzMirel.flick.data.remote.websocket.WebSocketApiImpl
 import com.ikuzMirel.flick.data.repositories.*
+import com.ikuzMirel.flick.data.room.dao.FriendDao
+import com.ikuzMirel.flick.service.NotificationService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -67,5 +66,12 @@ object AppModule {
     @Singleton
     fun provideWebSocketService(
         httpClient: HttpClient
-    ): WebSocketService = WebSocketServiceImpl(httpClient)
+    ): WebSocketApi = WebSocketApiImpl(httpClient)
+
+    @Provides
+    @Singleton
+    fun provideNotificationService(
+        @ApplicationContext context: Context,
+        friendDao: FriendDao
+    ): NotificationService = NotificationService(context, friendDao)
 }

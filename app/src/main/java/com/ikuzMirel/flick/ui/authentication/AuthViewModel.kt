@@ -3,17 +3,14 @@ package com.ikuzMirel.flick.ui.authentication
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ikuzMirel.flick.data.dto.login.request.LoginRequestDto
-import com.ikuzMirel.flick.data.dto.signup.request.SignupRequestDto
-import com.ikuzMirel.flick.data.repositories.PreferencesRepository
-import com.ikuzMirel.flick.data.remote.websocket.WebSocketService
+import com.ikuzMirel.flick.data.constants.LOGIN_CONFLICTED
+import com.ikuzMirel.flick.data.constants.USERNAME_CONFLICTED
 import com.ikuzMirel.flick.data.repositories.AuthRepository
-import com.ikuzMirel.flick.data.utils.LOGIN_CONFLICTED
-import com.ikuzMirel.flick.data.utils.ResponseResult
-import com.ikuzMirel.flick.data.utils.USERNAME_CONFLICTED
+import com.ikuzMirel.flick.data.repositories.PreferencesRepository
+import com.ikuzMirel.flick.data.requests.LoginRequest
+import com.ikuzMirel.flick.data.requests.SignupRequest
+import com.ikuzMirel.flick.data.response.BasicResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -28,25 +25,18 @@ class AuthViewModel @Inject constructor(
 
     val state = mutableStateOf(AuthUIState())
 
-    private val resultChannel = Channel<ResponseResult<String>>()
+    private val resultChannel = Channel<BasicResponse<String>>()
     val authResult = resultChannel.receiveAsFlow()
-
-    init {
-        state.value = state.value.copy(isInit = true)
-        println("AuthViewModel init")
-        state.value = state.value.copy(isInit = false)
-    }
 
     fun checkToken() {
         viewModelScope.launch {
-            when (preferencesRepository.getJwt().data) {
-                null -> {
+            when (preferencesRepository.getJwt()) {
+                "" -> {
                     state.value = state.value.copy(
                         hasToken = false
                     )
                 }
                 else -> {
-                    println(preferencesRepository.getJwt().data)
                     state.value = state.value.copy(
                         hasToken = true
                     )
@@ -83,13 +73,13 @@ class AuthViewModel @Inject constructor(
             state.value = state.value.copy(isLoading = true)
             delay(1000)
             val result = authRepository.login(
-                LoginRequestDto(
+                LoginRequest(
                     state.value.loginUsername,
                     state.value.LoginPassword
                 )
             )
             result.collect{
-                if (it is ResponseResult.Error && it.errorMessage == LOGIN_CONFLICTED) {
+                if (it is BasicResponse.Error && it.errorMessage == LOGIN_CONFLICTED) {
                     state.value = state.value.copy(
                         usernameError = true,
                         usernameErrorMessage = LOGIN_CONFLICTED,
@@ -98,7 +88,6 @@ class AuthViewModel @Inject constructor(
                     )
                 }
                 resultChannel.send(it)
-                println(it)
             }
             state.value = state.value.copy(isLoading = false)
         }
@@ -115,13 +104,13 @@ class AuthViewModel @Inject constructor(
                 state.value = state.value.copy(isLoading = false)
                 return@launch
             }
-            val request = SignupRequestDto(
+            val request = SignupRequest(
                 state.value.signUpUsername,
                 state.value.signUpPassword,
                 state.value.signUpEmail
             )
             authRepository.signUp(request).collect{ response ->
-                if (response is ResponseResult.Error) {
+                if (response is BasicResponse.Error) {
                     if (response.errorMessage == USERNAME_CONFLICTED){
                         state.value = state.value.copy(
                             usernameError = true,
@@ -132,14 +121,13 @@ class AuthViewModel @Inject constructor(
                     return@collect
                 }
 
-                val loginRequest = LoginRequestDto(
+                val loginRequest = LoginRequest(
                     state.value.signUpUsername,
                     state.value.signUpPassword
                 )
                 authRepository.login(loginRequest).collect{
                     resultChannel.send(it)
                 }
-                println("$response AuthVM")
             }
             state.value = state.value.copy(isLoading = false)
         }
@@ -148,7 +136,6 @@ class AuthViewModel @Inject constructor(
     fun authenticate() {
         viewModelScope.launch {
             authRepository.authenticate().collect{
-                println(it)
                 resultChannel.send(it)
             }
         }

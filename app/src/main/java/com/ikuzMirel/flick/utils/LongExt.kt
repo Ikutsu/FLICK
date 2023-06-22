@@ -1,7 +1,8 @@
 package com.ikuzMirel.flick.utils
 
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 fun Long.toDate(): String {
     val date = Date(this)

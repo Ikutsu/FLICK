@@ -33,10 +33,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ikuzMirel.flick.R
+import com.ikuzMirel.flick.data.constants.LOGIN_CONFLICTED
+import com.ikuzMirel.flick.data.constants.USERNAME_CONFLICTED
+import com.ikuzMirel.flick.data.response.BasicResponse
 import com.ikuzMirel.flick.data.service.NetworkService
-import com.ikuzMirel.flick.data.utils.LOGIN_CONFLICTED
-import com.ikuzMirel.flick.data.utils.ResponseResult
-import com.ikuzMirel.flick.data.utils.USERNAME_CONFLICTED
 import com.ikuzMirel.flick.ui.components.icons.KeyOutline
 import com.ikuzMirel.flick.ui.components.textFields.IconHintTextField
 import com.ikuzMirel.flick.ui.destinations.*
@@ -95,19 +95,19 @@ fun Authentication(
 
     LaunchedEffect(state, context) {
         viewModel.authResult.collect { result ->
-            println("$result Auth")
             when (result) {
-                is ResponseResult.Success -> {
+                is BasicResponse.Success -> {
                     context.stopService(Intent(context, NetworkService::class.java))
                     context.startService(Intent(context, NetworkService::class.java))
-                    navigator.navigate(MainContentDestination) {
+                    navigator.navigate(HomeDestination) {
                         popUpTo(AuthenticationDestination.route) {
                             inclusive = true
                         }
                         navigator.clearBackStack(AuthenticationDestination)
                     }
                 }
-                is ResponseResult.Error -> {
+
+                is BasicResponse.Error -> {
                     if (result.errorMessage != LOGIN_CONFLICTED && result.errorMessage != USERNAME_CONFLICTED) {
                         Toast.makeText(
                             context,
@@ -206,6 +206,7 @@ fun Authentication(
                         true -> KeyboardActions(onDone = {
                             focusManager.clearFocus()
                         })
+
                         false -> KeyboardActions(onNext = {
                             confirmPassFocusRequester.requestFocus()
                         })
@@ -249,6 +250,7 @@ fun Authentication(
                     enabled = when (isLogin) {
                         true -> state.loginUsername.isNotBlank()
                                 && state.LoginPassword.isNotBlank()
+
                         false -> state.signUpUsername.isNotBlank()
                                 && state.signUpEmail.isNotBlank()
                                 && state.signUpPassword.isNotBlank()
@@ -298,15 +300,13 @@ fun IconTitle(
                         scaleIn(
                             initialScale = 0.32f,
                             animationSpec = tween(200, delayMillis = 50)
-                        ) with
-                        fadeOut(animationSpec = tween(50))
+                        ) with fadeOut(animationSpec = tween(50))
             }
         ) {
             Text(
                 text = it,
                 fontSize = 24.sp,
-                color = MaterialTheme.colorScheme.onBackground,
-                fontFamily = cocogooseBold
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
     }
@@ -343,7 +343,6 @@ private fun BottomText(
                 text = it,
                 fontSize = 12.sp,
                 color = Gray50,
-                fontFamily = cocogooseLight,
             )
         }
         AnimatedContent(
@@ -358,7 +357,6 @@ private fun BottomText(
                 modifier = Modifier
                     .noRippleClickable { action() },
                 fontSize = 12.sp,
-                fontFamily = cocogooseSemiLight,
                 textDecoration = TextDecoration.Underline
             )
 
@@ -400,7 +398,6 @@ fun BasicButton(
                     false -> Color.White.copy(alpha = 0.5f)
                 },
                 fontSize = 18.sp,
-                fontFamily = cocogooseBold
             )
         }
         CircularProgressIndicator(

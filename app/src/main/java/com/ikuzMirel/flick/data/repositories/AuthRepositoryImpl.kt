@@ -1,11 +1,14 @@
 package com.ikuzMirel.flick.data.repositories
 
-import com.ikuzMirel.flick.data.dto.login.request.LoginRequestDto
+import android.content.Context
+import androidx.work.ExistingWorkPolicy
+import androidx.work.WorkManager
+import com.ikuzMirel.flick.data.constants.UNAUTHENTICATED
 import com.ikuzMirel.flick.data.remote.auth.AuthRemote
-import com.ikuzMirel.flick.data.dto.signup.request.SignupRequestDto
-import com.ikuzMirel.flick.data.utils.ResponseResult
-import com.ikuzMirel.flick.data.remote.websocket.WebSocketService
-import com.ikuzMirel.flick.data.utils.UNAUTHENTICATED
+import com.ikuzMirel.flick.data.requests.LoginRequest
+import com.ikuzMirel.flick.data.requests.SignupRequest
+import com.ikuzMirel.flick.data.response.BasicResponse
+import com.ikuzMirel.flick.worker.SyncWorker
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -13,58 +16,61 @@ import javax.inject.Inject
 class AuthRepositoryImpl @Inject constructor(
     private val remote: AuthRemote,
     private val preferencesRepository: PreferencesRepository,
-    private val webSocketRepository: WebSocketService
+    private val context: Context
 ): AuthRepository {
 
-    override suspend fun login(request: LoginRequestDto): Flow<ResponseResult<String>> {
+    override suspend fun login(request: LoginRequest): Flow<BasicResponse<String>> {
         return flow {
             when (val response = remote.login(request)) {
-                is ResponseResult.Error -> {
-                    emit(ResponseResult.error(response.errorMessage.error!!))
+                is BasicResponse.Error -> {
+                    emit(BasicResponse.Error(response.errorMessage))
                 }
-                is ResponseResult.Success -> {
-                    if (response.data?.data != null) {
-                        preferencesRepository.setJwt(response.data.data.token)
-                        preferencesRepository.setUsername(response.data.data.username)
-                        preferencesRepository.setUserId(response.data.data.userId)
-                        emit(ResponseResult.success())
+                is BasicResponse.Success -> {
+                    if (response.data != null) {
+                        preferencesRepository.setJwt(response.data.token)
+                        preferencesRepository.setUsername(response.data.username)
+                        preferencesRepository.setUserId(response.data.userId)
+                        WorkManager.getInstance(context).enqueueUniqueWork(
+                            "sync",
+                            ExistingWorkPolicy.KEEP,
+                            SyncWorker.startWork()
+                        )
+                        emit(BasicResponse.Success())
                     }
                 }
             }
         }
     }
 
-    override suspend fun signUp(request: SignupRequestDto): Flow<ResponseResult<String>> {
+    override suspend fun signUp(request: SignupRequest): Flow<BasicResponse<String>> {
         return flow {
             when (val response = remote.signup(request)) {
-                is ResponseResult.Error -> {
-                    println("$response AuthRepo")
-                    emit(ResponseResult.error(response.errorMessage))
+                is BasicResponse.Error -> {
+                    emit(BasicResponse.Error(response.errorMessage))
                 }
-                is ResponseResult.Success -> {
-                    println("$response AuthRepo")
-                    emit(ResponseResult.success())
+                is BasicResponse.Success -> {
+                    emit(BasicResponse.Success())
                 }
             }
         }
     }
 
-    override suspend fun authenticate(): Flow<ResponseResult<String>> {
+    override suspend fun authenticate(): Flow<BasicResponse<String>> {
         return flow {
 
-            val token = preferencesRepository.getJwt().data
-            if (token == null || token.isBlank()) {
-                emit(ResponseResult.error(UNAUTHENTICATED))
+            val token = preferencesRepository.getJwt()
+            if (token.isBlank()) {
+                emit(BasicResponse.Error(UNAUTHENTICATED))
                 return@flow
             }
 
             val response = remote.authenticate(token)
-            if (response is ResponseResult.Error) {
-                emit(ResponseResult.error(response.errorMessage))
+            if (response is BasicResponse.Error) {
+                emit(BasicResponse.Error(response.errorMessage))
                 return@flow
             }
 
-            emit(ResponseResult.success())
+            emit(BasicResponse.Success())
         }
     }
 }

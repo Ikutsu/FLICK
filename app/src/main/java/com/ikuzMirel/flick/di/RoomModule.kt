@@ -2,9 +2,9 @@ package com.ikuzMirel.flick.di
 
 import android.content.Context
 import androidx.room.Room
-import com.ikuzMirel.flick.data.local.dao.FriendDao
-import com.ikuzMirel.flick.data.local.dao.MessageDao
-import com.ikuzMirel.flick.data.local.database.UserDatabase
+import com.ikuzMirel.flick.data.room.dao.FriendDao
+import com.ikuzMirel.flick.data.room.dao.MessageDao
+import com.ikuzMirel.flick.data.room.database.UserDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

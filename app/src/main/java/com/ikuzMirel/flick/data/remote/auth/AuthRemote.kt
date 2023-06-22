@@ -1,21 +1,21 @@
 package com.ikuzMirel.flick.data.remote.auth
 
-import com.ikuzMirel.flick.data.dto.login.request.LoginRequestDto
-import com.ikuzMirel.flick.data.dto.login.response.LoginResponseDto
-import com.ikuzMirel.flick.data.dto.signup.request.SignupRequestDto
-import com.ikuzMirel.flick.data.utils.ResponseResult
+import com.ikuzMirel.flick.data.model.AuthData
+import com.ikuzMirel.flick.data.requests.LoginRequest
+import com.ikuzMirel.flick.data.requests.SignupRequest
+import com.ikuzMirel.flick.data.response.BasicResponse
 
 interface AuthRemote {
 
     suspend fun login(
-        request: LoginRequestDto
-    ): ResponseResult<LoginResponseDto>
+        request: LoginRequest
+    ): BasicResponse<AuthData>
 
     suspend fun signup(
-        request: SignupRequestDto
-    ): ResponseResult<String>
+        request: SignupRequest
+    ): BasicResponse<String>
 
     suspend fun authenticate(
         token: String
-    ): ResponseResult<String>
+    ): BasicResponse<String>
 }
