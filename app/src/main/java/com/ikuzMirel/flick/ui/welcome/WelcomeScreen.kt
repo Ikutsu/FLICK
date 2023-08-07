@@ -3,7 +3,6 @@ package com.ikuzMirel.flick.ui.welcome
 import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -19,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ikuzMirel.flick.R
 import com.ikuzMirel.flick.data.response.BasicResponse
 import com.ikuzMirel.flick.ui.authentication.AuthViewModel
@@ -35,7 +35,7 @@ fun Welcome(
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val state by viewModel.state
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(state, context) {
         viewModel.authResult.collect { result ->
@@ -82,10 +82,11 @@ fun Welcome(
         ) {
             Image(
                 painter = painterResource(
-                    id = when {
-                        isSystemInDarkTheme() -> R.drawable.flick_4x
-                        else -> R.drawable.flick_dark
-                    }
+                    id = R.drawable.flick_4x
+//                    when {
+//                        isSystemInDarkTheme() -> R.drawable.flick_4x
+//                        else -> R.drawable.flick_dark
+//                    }
                 ),
                 contentDescription = "",
                 alpha = 0.3f,

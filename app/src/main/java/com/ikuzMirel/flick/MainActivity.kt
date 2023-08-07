@@ -1,6 +1,5 @@
 package com.ikuzMirel.flick
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,12 +11,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ikuzMirel.flick.data.response.BasicResponse
-import com.ikuzMirel.flick.data.service.NetworkService
 import com.ikuzMirel.flick.ui.NavGraphs
 import com.ikuzMirel.flick.ui.authentication.AuthViewModel
 import com.ikuzMirel.flick.ui.destinations.HomeDestination
@@ -44,10 +41,11 @@ class MainActivity : ComponentActivity() {
                 val useDarkIcons = !isSystemInDarkTheme()
                 val navController = rememberNavController()
 
-                val darkTheme = when {
-                    isSystemInDarkTheme() -> Gray80
-                    else -> Color.White
-                }
+                val darkTheme = Gray80
+//                    when {
+//                    isSystemInDarkTheme() -> Gray80
+//                    else -> Color.White
+//                }
 
                 var isAuthenticated by remember { mutableStateOf(false) }
 
@@ -65,7 +63,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 SideEffect {
-                    systemUiController.setSystemBarsColor(darkTheme, darkIcons = useDarkIcons)
+                    systemUiController.setSystemBarsColor(darkTheme, darkIcons = false)
                 }
                 if (isAuthenticated) {
                     DestinationsNavHost(
@@ -82,10 +80,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        stopService(Intent(this, NetworkService::class.java))
     }
 }

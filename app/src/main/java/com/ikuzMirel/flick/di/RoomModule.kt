@@ -3,6 +3,7 @@ package com.ikuzMirel.flick.di
 import android.content.Context
 import androidx.room.Room
 import com.ikuzMirel.flick.data.room.dao.FriendDao
+import com.ikuzMirel.flick.data.room.dao.FriendReqDao
 import com.ikuzMirel.flick.data.room.dao.MessageDao
 import com.ikuzMirel.flick.data.room.database.UserDatabase
 import dagger.Module
@@ -37,4 +38,10 @@ object RoomModule {
     fun provideFriendDao(
         roomDatabase: UserDatabase
     ): FriendDao = roomDatabase.friendDao()
+
+    @Provides
+    @Singleton
+    fun provideFriendReqDao(
+        roomDatabase: UserDatabase
+    ): FriendReqDao = roomDatabase.friendReqDao()
 }

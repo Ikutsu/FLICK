@@ -65,7 +65,7 @@ fun FLICKTheme(
 
         SideEffect {
            currentWindow.statusBarColor = colorScheme.primary.toArgb()
-               WindowCompat.getInsetsController(currentWindow, view).isAppearanceLightStatusBars = darkTheme
+               WindowCompat.getInsetsController(currentWindow, view).isAppearanceLightStatusBars = true //darkTheme
         }
     }
 

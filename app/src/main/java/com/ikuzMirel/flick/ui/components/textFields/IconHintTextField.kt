@@ -4,7 +4,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -47,7 +46,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ikuzMirel.flick.ui.theme.Gray30
 import com.ikuzMirel.flick.ui.theme.Gray70
 import com.ikuzMirel.flick.ui.theme.Red50
 import com.ikuzMirel.flick.ui.theme.museoRegular
@@ -94,10 +92,11 @@ fun IconHintTextField(
                     .padding(horizontal = 32.dp)
                     .border(1.dp, Red50, RoundedCornerShape(15.dp))
                     .background(
-                        when {
-                            isSystemInDarkTheme() -> Gray70
-                            else -> Gray30
-                        },
+                        Gray70,
+//                        when {
+//                            isSystemInDarkTheme() -> Gray70
+//                            else -> Gray30
+//                        },
                         RoundedCornerShape(15.dp)
                     )
                 false -> Modifier
@@ -105,10 +104,11 @@ fun IconHintTextField(
                     .height(54.dp)
                     .padding(horizontal = 32.dp)
                     .background(
-                        when {
-                            isSystemInDarkTheme() -> Gray70
-                            else -> Gray30
-                        },
+                        Gray70,
+//                        when {
+//                            isSystemInDarkTheme() -> Gray70
+//                            else -> Gray30
+//                        },
                         RoundedCornerShape(15.dp)
                     )
             },

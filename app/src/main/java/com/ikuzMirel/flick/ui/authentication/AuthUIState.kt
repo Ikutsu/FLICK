@@ -9,10 +9,10 @@ data class AuthUIState (
     val loginUsername: String = "",
     val LoginPassword: String = "",
 
-    val signUpEmail: String = "",
-    val signUpUsername: String = "",
-    val signUpPassword: String = "",
-    val signUpConfirmPassword: String = "",
+    val signUpEmail: String = "abc@gmail.com",
+    val signUpUsername: String = "test",
+    val signUpPassword: String = "Qwert1234",
+    val signUpConfirmPassword: String = "Qwert1234",
 
     val emailError: Boolean = false,
     val usernameError: Boolean = false,

@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.ikuzMirel.flick.ui.components.dialogs.BasicDialog
+import com.ikuzMirel.flick.ui.destinations.AddFriendDestination
 import com.ikuzMirel.flick.ui.destinations.SettingDestination
 import com.ikuzMirel.flick.ui.home.contact.Contact
 import com.ikuzMirel.flick.ui.home.feed.Feed
@@ -38,7 +39,6 @@ enum class Screens(val icon: ImageVector, val contentDescription: String) {
 }
 
 @RootNavGraph(start = true)
-
 @OptIn(ExperimentalFoundationApi::class)
 @Destination
 @Composable
@@ -95,7 +95,7 @@ fun Home(
                 pagerState = pagerState,
                 navigator
             )
-            UseTopAppBar(navigator)
+            HomeTopAppBar(navigator)
             UseNavigationBar(
                 modifier = Modifier.align(Alignment.BottomCenter),
                 pagerState = pagerState
@@ -131,13 +131,13 @@ private fun Content(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UseTopAppBar(
+fun HomeTopAppBar(
     navigator: DestinationsNavigator
 ) {
     TopAppBar(
         title = {},
         navigationIcon = {
-            IconButton(onClick = { /* doSomething() */ }) {
+            IconButton(onClick = { /* TODO: PROFILE */ }) {
                 Icon(
                     imageVector = Icons.Outlined.AccountCircle,
                     contentDescription = "Account"
@@ -145,6 +145,12 @@ fun UseTopAppBar(
             }
         },
         actions = {
+            IconButton(onClick = { navigator.navigate(AddFriendDestination) }) {
+                Icon(
+                    imageVector = Icons.Outlined.Search,
+                    contentDescription = "Add friend"
+                )
+            }
             IconButton(onClick = { navigator.navigate(SettingDestination) }) {
                 Icon(
                     imageVector = Icons.Outlined.Settings,

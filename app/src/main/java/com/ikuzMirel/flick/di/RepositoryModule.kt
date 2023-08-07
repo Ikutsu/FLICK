@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.ikuzMirel.flick.data.remote.auth.AuthRemote
 import com.ikuzMirel.flick.data.remote.chat.ChatRemote
+import com.ikuzMirel.flick.data.remote.friendRequest.FriendRequestRemote
 import com.ikuzMirel.flick.data.remote.user.UserRemote
 import com.ikuzMirel.flick.data.repositories.*
 import dagger.Module
@@ -12,6 +13,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import io.ktor.client.HttpClient
 import javax.inject.Singleton
 
 @Module
@@ -30,7 +32,8 @@ object RepositoryModule {
         authRemote: AuthRemote,
         preferencesRepository: PreferencesRepository,
         @ApplicationContext context: Context,
-    ): AuthRepository = AuthRepositoryImpl(authRemote, preferencesRepository, context)
+        httpClient: HttpClient
+    ): AuthRepository = AuthRepositoryImpl(httpClient, authRemote, preferencesRepository, context)
 
     @Provides
     @Singleton
@@ -43,4 +46,10 @@ object RepositoryModule {
     fun provideChatRepository(
         chatRemote: ChatRemote
     ): ChatRepository = ChatRepositoryImpl(chatRemote)
+
+    @Provides
+    @Singleton
+    fun provideFriendReqRepository(
+        friendRequestRemote: FriendRequestRemote
+    ): FriendReqRepository = FriendReqRepositoryImpl(friendRequestRemote)
 }

@@ -31,6 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ikuzMirel.flick.R
 import com.ikuzMirel.flick.domain.model.Friend
 import com.ikuzMirel.flick.ui.destinations.ChatDestination
@@ -45,7 +46,7 @@ fun Contact(
     navigator: DestinationsNavigator,
     viewModel: ContactViewModel = hiltViewModel()
 ) {
-    val state by viewModel.state
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit){
         viewModel.getFriends()
