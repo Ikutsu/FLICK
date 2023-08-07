@@ -4,10 +4,13 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.work.WorkManager
 import com.ikuzMirel.flick.data.remote.auth.AuthRemote
 import com.ikuzMirel.flick.data.remote.auth.AuthRemoteImpl
 import com.ikuzMirel.flick.data.remote.chat.ChatRemote
 import com.ikuzMirel.flick.data.remote.chat.ChatRemoteImpl
+import com.ikuzMirel.flick.data.remote.friendRequest.FriendRequestRemote
+import com.ikuzMirel.flick.data.remote.friendRequest.FriendRequestRemoteImpl
 import com.ikuzMirel.flick.data.remote.user.UserRemote
 import com.ikuzMirel.flick.data.remote.user.UserRemoteImpl
 import com.ikuzMirel.flick.data.remote.websocket.WebSocketApi
@@ -64,6 +67,12 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideFriendRequestRemote(
+        httpClient: HttpClient
+    ): FriendRequestRemote = FriendRequestRemoteImpl(httpClient)
+
+    @Provides
+    @Singleton
     fun provideWebSocketService(
         httpClient: HttpClient
     ): WebSocketApi = WebSocketApiImpl(httpClient)
@@ -74,4 +83,10 @@ object AppModule {
         @ApplicationContext context: Context,
         friendDao: FriendDao
     ): NotificationService = NotificationService(context, friendDao)
+
+    @Provides
+    @Singleton
+    fun provideWorkManager(
+        @ApplicationContext context: Context
+    ): WorkManager = WorkManager.getInstance(context)
 }

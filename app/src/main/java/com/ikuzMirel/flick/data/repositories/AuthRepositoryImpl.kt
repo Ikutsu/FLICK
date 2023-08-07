@@ -9,11 +9,16 @@ import com.ikuzMirel.flick.data.requests.LoginRequest
 import com.ikuzMirel.flick.data.requests.SignupRequest
 import com.ikuzMirel.flick.data.response.BasicResponse
 import com.ikuzMirel.flick.worker.SyncWorker
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.BearerAuthProvider
+import io.ktor.client.plugins.plugin
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
+    private val client: HttpClient,
     private val remote: AuthRemote,
     private val preferencesRepository: PreferencesRepository,
     private val context: Context
@@ -30,8 +35,11 @@ class AuthRepositoryImpl @Inject constructor(
                         preferencesRepository.setJwt(response.data.token)
                         preferencesRepository.setUsername(response.data.username)
                         preferencesRepository.setUserId(response.data.userId)
+                        client.plugin(Auth).providers
+                            .filterIsInstance<BearerAuthProvider>()
+                            .first().clearToken()
                         WorkManager.getInstance(context).enqueueUniqueWork(
-                            "sync",
+                            SyncWorker.WORK_NAME,
                             ExistingWorkPolicy.KEEP,
                             SyncWorker.startWork()
                         )

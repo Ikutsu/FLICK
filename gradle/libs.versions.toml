@@ -114,6 +114,7 @@ ktor-serialization = { group = "io.ktor", name = "ktor-client-serialization", ve
 ktor-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
 ktor-contentNegotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-auth = { group = "io.ktor", name = "ktor-client-auth", version.ref = "ktor" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit-junit" }
 ui-testJunit4 = { module = "androidx.compose.ui:ui-test-junit4" }

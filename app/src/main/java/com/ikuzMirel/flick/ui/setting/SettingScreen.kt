@@ -1,6 +1,5 @@
 package com.ikuzMirel.flick.ui.setting
 
-import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,11 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.ikuzMirel.flick.data.service.NetworkService
 import com.ikuzMirel.flick.ui.destinations.AuthenticationDestination
 import com.ikuzMirel.flick.ui.destinations.HomeDestination
 import com.ikuzMirel.flick.ui.theme.Red50
@@ -32,7 +29,6 @@ fun Setting(
     navigator: DestinationsNavigator,
     viewModel: SettingViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -43,7 +39,6 @@ fun Setting(
         Button(
             onClick = {
                 viewModel.logout()
-                context.stopService(Intent(context, NetworkService::class.java))
                 runBlocking {
                     navigator.navigate(AuthenticationDestination(true)){
                         popUpTo(HomeDestination.route){

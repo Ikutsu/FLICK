@@ -119,6 +119,7 @@ dependencies {
     implementation (libs.ktor.logging)
     implementation (libs.ktor.contentNegotiation)
     implementation (libs.ktor.serialization.json)
+    implementation (libs.ktor.auth)
 
     //Room
     implementation (libs.room.runtime)

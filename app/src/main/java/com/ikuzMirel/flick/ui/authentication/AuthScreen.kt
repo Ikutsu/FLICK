@@ -1,6 +1,5 @@
 package com.ikuzMirel.flick.ui.authentication
 
-import android.content.Intent
 import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -32,11 +31,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ikuzMirel.flick.R
 import com.ikuzMirel.flick.data.constants.LOGIN_CONFLICTED
 import com.ikuzMirel.flick.data.constants.USERNAME_CONFLICTED
 import com.ikuzMirel.flick.data.response.BasicResponse
-import com.ikuzMirel.flick.data.service.NetworkService
 import com.ikuzMirel.flick.ui.components.icons.KeyOutline
 import com.ikuzMirel.flick.ui.components.textFields.IconHintTextField
 import com.ikuzMirel.flick.ui.destinations.*
@@ -53,7 +52,7 @@ fun Authentication(
     _isLogin: Boolean = false
 ) {
     var isLogin by remember { mutableStateOf(_isLogin) }
-    val state by viewModel.state
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
@@ -97,8 +96,7 @@ fun Authentication(
         viewModel.authResult.collect { result ->
             when (result) {
                 is BasicResponse.Success -> {
-                    context.stopService(Intent(context, NetworkService::class.java))
-                    context.startService(Intent(context, NetworkService::class.java))
+                    viewModel.startWorkManager()
                     navigator.navigate(HomeDestination) {
                         popUpTo(AuthenticationDestination.route) {
                             inclusive = true
@@ -151,7 +149,7 @@ fun Authentication(
                     placeholder = "E-mail",
                     imeAction = ImeAction.Next,
                     value = state.signUpEmail,
-                    onValueChange = { viewModel.onEvent(AuthUIEvent.SignUpEmailChanged(it)) },
+                    onValueChange = { viewModel.onSignUpEmailChange(it) },
                     focusRequester = emailFocusRequester,
                     keyboardActions = KeyboardActions(onNext = {
                         usernameFocusRequester.requestFocus()
@@ -172,8 +170,8 @@ fun Authentication(
                     },
                     onValueChange = {
                         when (isLogin) {
-                            true -> viewModel.onEvent(AuthUIEvent.LoginUsernameChanged(it))
-                            false -> viewModel.onEvent(AuthUIEvent.SignUpUsernameChanged(it))
+                            true -> viewModel.onLoginUsernameChange(it)
+                            false -> viewModel.onSignUpUsernameChange(it)
                         }
                     },
                     focusRequester = usernameFocusRequester,
@@ -197,8 +195,8 @@ fun Authentication(
                     },
                     onValueChange = {
                         when (isLogin) {
-                            true -> viewModel.onEvent(AuthUIEvent.LoginPasswordChanged(it))
-                            false -> viewModel.onEvent(AuthUIEvent.SignUpPasswordChanged(it))
+                            true -> viewModel.onLoginPasswordChange(it)
+                            false -> viewModel.onSignUpPasswordChange(it)
                         }
                     },
                     focusRequester = passwordFocusRequester,
@@ -222,7 +220,7 @@ fun Authentication(
                     imeAction = ImeAction.Done,
                     value = state.signUpConfirmPassword,
                     onValueChange = {
-                        viewModel.onEvent(AuthUIEvent.SignUpConfirmPasswordChanged(it))
+                        viewModel.onSignUpPasswordConfirmChange(it)
                     },
                     focusRequester = confirmPassFocusRequester,
                     keyboardActions = KeyboardActions(onDone = {
@@ -239,8 +237,8 @@ fun Authentication(
                         focusManager.clearFocus()
                         viewModel.clearError()
                         when (isLogin) {
-                            true -> viewModel.onEvent(AuthUIEvent.Login)
-                            false -> viewModel.onEvent(AuthUIEvent.SignUp)
+                            true -> viewModel.login()
+                            false -> viewModel.signUp()
                         }
                     },
                     text = when (isLogin) {
@@ -283,10 +281,11 @@ fun IconTitle(
     ) {
         Image(
             painter = painterResource(
-                id = when {
-                    isSystemInDarkTheme() -> R.drawable.flick_4x
-                    else -> R.drawable.flick_dark
-                }
+                id = R.drawable.flick_4x
+//                when {
+//                    isSystemInDarkTheme() -> R.drawable.flick_4x
+//                    else -> R.drawable.flick_dark
+//                }
             ),
             contentDescription = "",
             modifier = Modifier

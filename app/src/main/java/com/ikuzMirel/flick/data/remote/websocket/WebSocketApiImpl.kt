@@ -32,6 +32,7 @@ class WebSocketApiImpl @Inject constructor(
 
     override suspend fun connectToSocket(userId: String, token: String): BasicResponse<String> {
         return try {
+            println( "connectToSocket: userId: $userId, token: $token")
             webSocketSession = client.webSocketSession {
                 url(ENDPOINT_WEBSOCKET).apply {
                     parameter("Uid", userId)

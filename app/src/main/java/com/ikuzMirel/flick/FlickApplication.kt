@@ -4,18 +4,15 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_HIGH
-import android.content.ComponentName
-import android.content.Intent
-import android.content.ServiceConnection
 import android.os.Build
-import android.os.IBinder
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkManager
 import com.ikuzMirel.flick.data.repositories.PreferencesRepository
-import com.ikuzMirel.flick.data.service.NetworkService
 import com.ikuzMirel.flick.worker.SyncWorker
+import com.ikuzMirel.flick.worker.WebSocketWorker
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -23,24 +20,12 @@ import javax.inject.Inject
 @HiltAndroidApp
 class FlickApplication: Application(), Configuration.Provider{
 
-    private lateinit var mService: NetworkService
 
     @Inject
     lateinit var preferencesRepository: PreferencesRepository
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
-
-    private val connection = object : ServiceConnection {
-
-        override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            val binder = service as NetworkService.LocalBinder
-            mService = binder.getService()
-        }
-
-        override fun onServiceDisconnected(arg0: ComponentName) {
-        }
-    }
 
 
     override fun onCreate() {
@@ -50,13 +35,8 @@ class FlickApplication: Application(), Configuration.Provider{
 //        filter.addAction(Intent.ACTION_BOOT_COMPLETED)
 //        registerReceiver(receiver, filter)
 //        if (preferencesRepository.getIsFirstTime())
-        val serviceIntent = Intent(this, NetworkService::class.java)
-        startService(serviceIntent)
-        Intent(this, NetworkService::class.java).also { intent ->
-            bindService(intent, connection, BIND_AUTO_CREATE)
-        }
         runBlocking {
-            if (preferencesRepository.getJwt().isNotBlank()) startSync()
+            if (preferencesRepository.getJwt().isNotEmpty()) startSyncAndWebSocket()
         }
         createNotificationChannel()
     }
@@ -65,23 +45,37 @@ class FlickApplication: Application(), Configuration.Provider{
 
     private fun createNotificationChannel(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationChannel = NotificationChannel(
-                "flick_channel",
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+
+            val messageNotificationChannel = NotificationChannel(
+                "flick_msg_channel",
                 "Flick",
                 IMPORTANCE_HIGH
             )
-            notificationChannel.description = "A channel for Flick chat notifications"
-            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(notificationChannel)
+            messageNotificationChannel.description = "A channel for Flick chat notifications"
+            notificationManager.createNotificationChannel(messageNotificationChannel)
+
+            val friendReqNotificationChannel = NotificationChannel(
+                "flick_FR_channel",
+                "Flick",
+                IMPORTANCE_HIGH
+            )
+            friendReqNotificationChannel.description = "A channel for Flick friend request notifications"
+            notificationManager.createNotificationChannel(friendReqNotificationChannel)
         }
     }
 
-    private fun startSync(){
+    private fun startSyncAndWebSocket(){
         WorkManager.getInstance(this).apply {
             enqueueUniqueWork(
-                "sync",
+                SyncWorker.WORK_NAME,
                 ExistingWorkPolicy.KEEP,
                 SyncWorker.startWork()
+            )
+            enqueueUniquePeriodicWork(
+                WebSocketWorker.WORK_NAME,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+                WebSocketWorker.startWork()
             )
         }
     }
