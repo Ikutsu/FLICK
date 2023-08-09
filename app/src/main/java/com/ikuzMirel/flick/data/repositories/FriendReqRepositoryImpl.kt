@@ -1,7 +1,6 @@
 package com.ikuzMirel.flick.data.repositories
 
 import com.ikuzMirel.flick.data.remote.friendRequest.FriendRequestRemote
-import com.ikuzMirel.flick.data.requests.FriendReqRequest
 import com.ikuzMirel.flick.data.requests.SendFriendReqRequest
 import com.ikuzMirel.flick.data.response.BasicResponse
 import com.ikuzMirel.flick.data.response.FriendRequestListResponse
@@ -31,7 +30,7 @@ class FriendReqRepositoryImpl @Inject constructor(
     }
 
     override suspend fun cancelFriendRequest(
-        request: FriendReqRequest
+        request: String
     ): Flow<BasicResponse<FriendRequestEntity>> {
         return flow {
             when (val response = remote.cancelFriendRequest(request)) {
@@ -47,7 +46,7 @@ class FriendReqRepositoryImpl @Inject constructor(
     }
 
     override suspend fun acceptFriendRequest(
-        request: FriendReqRequest
+        request: String
     ): Flow<BasicResponse<FriendRequestEntity>> {
         return flow {
             when (val response = remote.acceptFriendRequest(request)) {
@@ -63,7 +62,7 @@ class FriendReqRepositoryImpl @Inject constructor(
     }
 
     override suspend fun rejectFriendRequest(
-        request: FriendReqRequest
+        request: String
     ): Flow<BasicResponse<FriendRequestEntity>> {
         return flow {
             when (val response = remote.rejectFriendRequest(request)) {
@@ -78,11 +77,9 @@ class FriendReqRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAllSentFriendRequests(
-        token: String
-    ): Flow<BasicResponse<FriendRequestListResponse>> {
+    override suspend fun getAllSentFriendRequests(): Flow<BasicResponse<FriendRequestListResponse>> {
         return flow {
-            when (val response = remote.getAllSentFriendRequests(token)) {
+            when (val response = remote.getAllSentFriendRequests()) {
                 is BasicResponse.Success -> {
                     emit(BasicResponse.Success(response.data))
                 }
@@ -94,11 +91,9 @@ class FriendReqRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAllReceivedFriendRequests(
-        token: String
-    ): Flow<BasicResponse<FriendRequestListResponse>> {
+    override suspend fun getAllReceivedFriendRequests(): Flow<BasicResponse<FriendRequestListResponse>> {
         return flow {
-            when (val response = remote.getAllReceivedFriendRequests(token)) {
+            when (val response = remote.getAllReceivedFriendRequests()) {
                 is BasicResponse.Success -> {
                     emit(BasicResponse.Success(response.data))
                 }

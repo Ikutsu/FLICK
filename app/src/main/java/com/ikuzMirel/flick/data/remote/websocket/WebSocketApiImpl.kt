@@ -7,7 +7,6 @@ import com.ikuzMirel.flick.data.response.BasicResponse
 import com.ikuzMirel.flick.data.response.WebSocketResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.webSocketSession
-import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.parameter
 import io.ktor.client.request.url
 import io.ktor.websocket.Frame
@@ -30,13 +29,12 @@ class WebSocketApiImpl @Inject constructor(
 
     private var webSocketSession: WebSocketSession? = null
 
-    override suspend fun connectToSocket(userId: String, token: String): BasicResponse<String> {
+    override suspend fun connectToSocket(userId: String): BasicResponse<String> {
         return try {
-            println( "connectToSocket: userId: $userId, token: $token")
+            println( "connectToSocket: userId: $userId")
             webSocketSession = client.webSocketSession {
                 url(ENDPOINT_WEBSOCKET).apply {
                     parameter("Uid", userId)
-                    bearerAuth(token)
                 }
             }
             if (webSocketSession?.isActive == true) {

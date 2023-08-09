@@ -5,8 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.ikuzMirel.flick.data.repositories.FriendReqRepository
 import com.ikuzMirel.flick.data.repositories.PreferencesRepository
 import com.ikuzMirel.flick.data.repositories.UserRepository
-import com.ikuzMirel.flick.data.requests.FriendListRequest
-import com.ikuzMirel.flick.data.requests.FriendReqRequest
 import com.ikuzMirel.flick.data.response.BasicResponse
 import com.ikuzMirel.flick.data.room.dao.FriendDao
 import com.ikuzMirel.flick.data.room.dao.FriendReqDao
@@ -41,7 +39,7 @@ class FriendRequestViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val userId = preferencesRepository.getUserId()
+            val userId = preferencesRepository.getValue(PreferencesRepository.USERID)!!
             fetchFriendRequests(userId)
         }
     }
@@ -70,21 +68,16 @@ class FriendRequestViewModel @Inject constructor(
 
     fun onAcceptRequest(friendReqId: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val request = FriendReqRequest(friendReqId)
-            friendReqRepository.acceptFriendRequest(request).collect { response ->
+            friendReqRepository.acceptFriendRequest(friendReqId).collect { response ->
                 when (response) {
                     is BasicResponse.Success -> {
-                        val friendRequest = friendReqDao.getFriendReq(request.requestId).copy(
+                        val friendRequest = friendReqDao.getFriendReq(friendReqId).copy(
                             status = FriendRequestStatus.ACCEPTED.name
                         )
                         friendReqDao.upsertFriendReq(friendRequest)
 
-                        val newFriendListRequest = FriendListRequest(
-                            preferencesRepository.getUserId(),
-                            preferencesRepository.getJwt()
-                        )
                         val newFriendList =
-                            userRepository.getUserFriends(newFriendListRequest).first()
+                            userRepository.getUserFriends().first()
                         _uiState.update { state ->
                             val list = state.receivedRequests.toMutableList()
                             val data = list.find { it.id == friendReqId }
@@ -114,11 +107,10 @@ class FriendRequestViewModel @Inject constructor(
 
     fun onRejectRequest(friendReqId: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val request = FriendReqRequest(friendReqId)
-            friendReqRepository.rejectFriendRequest(request).collect {
+            friendReqRepository.rejectFriendRequest(friendReqId).collect {
                 when (it) {
                     is BasicResponse.Success -> {
-                        val friendRequest = friendReqDao.getFriendReq(request.requestId).copy(
+                        val friendRequest = friendReqDao.getFriendReq(friendReqId).copy(
                             status = FriendRequestStatus.REJECTED.name
                         )
                         friendReqDao.upsertFriendReq(friendRequest)
@@ -148,8 +140,7 @@ class FriendRequestViewModel @Inject constructor(
 
     fun onCancelRequest(friendReqId: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val request = FriendReqRequest(friendReqId)
-            friendReqRepository.cancelFriendRequest(request).collect {
+            friendReqRepository.cancelFriendRequest(friendReqId).collect {
                 when (it) {
                     is BasicResponse.Success -> {
                         friendReqDao.deleteFriendReq(friendReqId)

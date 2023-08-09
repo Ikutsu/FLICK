@@ -36,7 +36,8 @@ class FlickApplication: Application(), Configuration.Provider{
 //        registerReceiver(receiver, filter)
 //        if (preferencesRepository.getIsFirstTime())
         runBlocking {
-            if (preferencesRepository.getJwt().isNotEmpty()) startSyncAndWebSocket()
+            preferencesRepository.getValue(PreferencesRepository.TOKEN) ?: return@runBlocking
+            startSyncAndWebSocket()
         }
         createNotificationChannel()
     }

@@ -15,7 +15,5 @@ interface AuthRemote {
         request: SignupRequest
     ): BasicResponse<String>
 
-    suspend fun authenticate(
-        token: String
-    ): BasicResponse<String>
+    suspend fun authenticate(): BasicResponse<String>
 }

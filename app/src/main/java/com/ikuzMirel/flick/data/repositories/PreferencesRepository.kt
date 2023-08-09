@@ -16,42 +16,27 @@ class PreferencesRepository @Inject constructor(
 ) {
 
     companion object {
-        private val jwt = stringPreferencesKey("JWT")
-        private val username = stringPreferencesKey("username")
-        private val userId = stringPreferencesKey("userId")
-        private val email = stringPreferencesKey("email")
-        private val isFirstTime = booleanPreferencesKey("isFirstTime")
+        val TOKEN = stringPreferencesKey("JWT")
+        val USERNAME = stringPreferencesKey("username")
+        val USERID = stringPreferencesKey("userId")
+        val EMAIL = stringPreferencesKey("email")
+        val FIRST_TIME = booleanPreferencesKey("isFirstTime")
     }
-
-    suspend fun getJwt(): String = getValue(jwt) ?: ""
-    suspend fun setJwt(token: String) = setValue(jwt, token)
-
-    suspend fun getUsername() = getValue(username) ?: ""
-    suspend fun setUsername(newUsername: String) = setValue(username, newUsername)
-
-    suspend fun getUserId() = getValue(userId) ?: ""
-    suspend fun setUserId(newUserId: String) = setValue(userId, newUserId)
-
-    suspend fun getEmail() = getValue(email) ?: ""
-    suspend fun setEmail(newEmail: String) = setValue(email, newEmail)
-
-    suspend fun getIsFirstTime() = getValue(isFirstTime) ?: false
-    suspend fun setIsFirstTime(newValue: Boolean) = setValue(isFirstTime, newValue)
 
     suspend fun clearUserData() {
         dataStore.edit {
-            it[jwt] = ""
-            it[username] = ""
-            it[userId] = ""
-            it[email] = ""
+            it[TOKEN] = ""
+            it[USERNAME] = ""
+            it[USERID] = ""
+            it[EMAIL] = ""
         }
     }
 
-    private suspend fun <T : Any> getValue(key: Preferences.Key<T>): T? {
+    suspend fun <T> getValue(key: Preferences.Key<T>): T? {
         return dataStore.data.map { it[key] }.first()
     }
 
-    private suspend fun <T : Any> setValue(
+    suspend fun <T> setValue(
         key: Preferences.Key<T>,
         value: T
     ) {

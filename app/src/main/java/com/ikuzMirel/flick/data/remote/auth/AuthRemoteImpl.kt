@@ -12,7 +12,6 @@ import com.ikuzMirel.flick.data.requests.SignupRequest
 import com.ikuzMirel.flick.data.response.BasicResponse
 import com.ikuzMirel.flick.data.response.processHttpResponse
 import io.ktor.client.HttpClient
-import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -39,11 +38,9 @@ class AuthRemoteImpl @Inject constructor(
         )
     }
 
-    override suspend fun authenticate(token: String): BasicResponse<String> {
+    override suspend fun authenticate(): BasicResponse<String> {
         return processHttpResponse(
-            request = client.get(ENDPOINT_AUTH) {
-                bearerAuth(token)
-            },
+            request = client.get(ENDPOINT_AUTH),
             specificError = UNAUTHENTICATED
         )
     }

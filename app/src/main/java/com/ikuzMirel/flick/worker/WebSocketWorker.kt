@@ -40,7 +40,7 @@ class WebSocketWorker @AssistedInject constructor(
     private val notificationService: NotificationService
 ) : CoroutineWorker(context, params) {
 
-    val notification = NotificationCompat.Builder(context, "flick_channel")
+    private val notification = NotificationCompat.Builder(context, "flick_channel")
         .setContentTitle("Worker notification")
         .setContentText("Worker notification")
         .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -52,13 +52,11 @@ class WebSocketWorker @AssistedInject constructor(
         if (webSocketApi.checkConnection()) {
             return@withContext Result.success()
         }
-        val userId = preferencesRepository.getUserId()
-        val jwt = preferencesRepository.getJwt()
-        if (userId.isBlank() && jwt.isBlank()) {
+        val userId = preferencesRepository.getValue(PreferencesRepository.USERID) ?: run {
             return@withContext Result.failure()
         }
 
-        val connection = webSocketApi.connectToSocket(userId, jwt)
+        val connection = webSocketApi.connectToSocket(userId)
         println("WebSocketWorker: connection: $connection")
         if (connection is BasicResponse.Success) {
             receiveIncomingMessages()
@@ -74,7 +72,7 @@ class WebSocketWorker @AssistedInject constructor(
     }
 
     private suspend fun receiveIncomingMessages() {
-        val myUserId = preferencesRepository.getUserId()
+        val myUserId = preferencesRepository.getValue(PreferencesRepository.USERID) ?: return
         webSocketApi.receiveMessage().collect { message ->
             println(message.type)
             println(message.data)
@@ -91,9 +89,7 @@ class WebSocketWorker @AssistedInject constructor(
                     when (friendReq.status) {
                         FriendRequestStatus.ACCEPTED.name -> {
                             val newFriend = userRepository.getUserFriend(
-                                myUserId,
-                                message.data.receiverId,
-                                preferencesRepository.getJwt()
+                                message.data.receiverId
                             ).first()
                             if (newFriend is BasicResponse.Success) {
                                 friendDao.upsertFriend(newFriend.data!!)

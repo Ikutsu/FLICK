@@ -52,7 +52,7 @@ object NetworkModule {
             install(Auth) {
                 bearer {
                     loadTokens {
-                        BearerTokens(preferencesRepository.getJwt(), "")
+                        BearerTokens(preferencesRepository.getValue(PreferencesRepository.TOKEN) ?: "", "")
                     }
                 }
             }

@@ -86,19 +86,18 @@ class AuthViewModel @Inject constructor(
 
     fun checkToken() {
         viewModelScope.launch {
-            val token = preferencesRepository.getJwt()
-            if (token.isBlank()) {
+            preferencesRepository.getValue(PreferencesRepository.TOKEN) ?: run {
                 _uiState.update {
                     it.copy(
                         hasToken = false
                     )
                 }
-            } else {
-                _uiState.update {
-                    it.copy(
-                        hasToken = true
-                    )
-                }
+                return@launch
+            }
+            _uiState.update {
+                it.copy(
+                    hasToken = true
+                )
             }
         }
     }

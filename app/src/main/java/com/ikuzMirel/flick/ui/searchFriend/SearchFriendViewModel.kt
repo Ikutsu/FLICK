@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.ikuzMirel.flick.data.repositories.FriendReqRepository
 import com.ikuzMirel.flick.data.repositories.PreferencesRepository
 import com.ikuzMirel.flick.data.repositories.UserRepository
-import com.ikuzMirel.flick.data.requests.SearchUsersRequest
 import com.ikuzMirel.flick.data.requests.SendFriendReqRequest
 import com.ikuzMirel.flick.data.response.BasicResponse
 import com.ikuzMirel.flick.data.room.dao.FriendReqDao
@@ -41,8 +40,8 @@ class SearchFriendViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            token.value = preferencesRepository.getJwt()
-            userId.value = preferencesRepository.getUserId()
+            token.value = preferencesRepository.getValue(PreferencesRepository.TOKEN)!!
+            userId.value = preferencesRepository.getValue(PreferencesRepository.USERID)!!
         }
     }
 
@@ -57,11 +56,7 @@ class SearchFriendViewModel @Inject constructor(
                 }
                 return@launch
             }
-            val request = SearchUsersRequest(
-                searchQuery = query,
-                token = token.value
-            )
-            userRepository.searchUsers(request).collect { response ->
+            userRepository.searchUsers(query).collect { response ->
                 when (response) {
                     is BasicResponse.Success -> {
                         _uiState.update {

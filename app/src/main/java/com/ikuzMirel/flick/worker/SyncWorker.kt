@@ -10,10 +10,7 @@ import androidx.work.WorkerParameters
 import com.ikuzMirel.flick.R
 import com.ikuzMirel.flick.data.repositories.ChatRepository
 import com.ikuzMirel.flick.data.repositories.FriendReqRepository
-import com.ikuzMirel.flick.data.repositories.PreferencesRepository
 import com.ikuzMirel.flick.data.repositories.UserRepository
-import com.ikuzMirel.flick.data.requests.FriendListRequest
-import com.ikuzMirel.flick.data.requests.MessageListRequest
 import com.ikuzMirel.flick.data.response.BasicResponse
 import com.ikuzMirel.flick.data.room.dao.FriendDao
 import com.ikuzMirel.flick.data.room.dao.FriendReqDao
@@ -30,7 +27,6 @@ import kotlinx.coroutines.withContext
 class SyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val preferencesRepository: PreferencesRepository,
     private val chatRepository: ChatRepository,
     private val userRepository: UserRepository,
     private val friendReqRepository: FriendReqRepository,
@@ -47,17 +43,11 @@ class SyncWorker @AssistedInject constructor(
         .build()
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        val jwt = preferencesRepository.getJwt()
-        val userId = preferencesRepository.getUserId()
-
-        if (jwt.isBlank() || userId.isBlank()) {
-            Result.failure()
-        }
 
         val syncSuccess = awaitAll(
-            async { fetchFriendListAndUpdateDB(jwt, userId) },
-            async { fetchMessagesAndUpdateDB(jwt) },
-            async { fetchFriendRequestsAndUpdateDB(jwt) }
+            async { fetchFriendListAndUpdateDB() },
+            async { fetchMessagesAndUpdateDB() },
+            async { fetchFriendRequestsAndUpdateDB() }
         ).all { it }
 
         if (syncSuccess) {
@@ -71,9 +61,9 @@ class SyncWorker @AssistedInject constructor(
         return ForegroundInfo(3, notification)
     }
 
-    private suspend fun fetchFriendListAndUpdateDB(jwt: String, userId: String): Boolean {
+    private suspend fun fetchFriendListAndUpdateDB(): Boolean {
         var success = false
-        val response = userRepository.getUserFriends(FriendListRequest(userId, jwt)).first()
+        val response = userRepository.getUserFriends().first()
         if (response is BasicResponse.Success) {
             response.data?.friends?.forEach {
                 friendDao.upsertFriend(it)
@@ -83,14 +73,14 @@ class SyncWorker @AssistedInject constructor(
         return success
     }
 
-    private suspend fun fetchMessagesAndUpdateDB(jwt: String): Boolean {
+    private suspend fun fetchMessagesAndUpdateDB(): Boolean {
         var success = false
         val cids = friendDao.getAllFriendsCIDs().first()
         if (cids.isEmpty()) {
             success = true
         } else {
-            for (id in cids) {
-                val result = chatRepository.getChatMassages(MessageListRequest(id, jwt)).first()
+            for (cid in cids) {
+                val result = chatRepository.getChatMassages(cid).first()
                 if (result is BasicResponse.Success) {
                     result.data?.messages?.forEach {
                         messageDao.upsertMessage(it)
@@ -102,10 +92,10 @@ class SyncWorker @AssistedInject constructor(
         return success
     }
 
-    private suspend fun fetchFriendRequestsAndUpdateDB(jwt: String): Boolean {
+    private suspend fun fetchFriendRequestsAndUpdateDB(): Boolean {
         var success = false
-        val receivedReq = friendReqRepository.getAllReceivedFriendRequests(jwt).first()
-        val sentReq = friendReqRepository.getAllSentFriendRequests(jwt).first()
+        val receivedReq = friendReqRepository.getAllReceivedFriendRequests().first()
+        val sentReq = friendReqRepository.getAllSentFriendRequests().first()
         if (receivedReq is BasicResponse.Success) {
             receivedReq.data?.friendRequests?.forEach {
                 friendReqDao.upsertFriendReq(it)

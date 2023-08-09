@@ -3,7 +3,6 @@ package com.ikuzMirel.flick.data.repositories
 import android.content.Context
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkManager
-import com.ikuzMirel.flick.data.constants.UNAUTHENTICATED
 import com.ikuzMirel.flick.data.remote.auth.AuthRemote
 import com.ikuzMirel.flick.data.requests.LoginRequest
 import com.ikuzMirel.flick.data.requests.SignupRequest
@@ -32,9 +31,9 @@ class AuthRepositoryImpl @Inject constructor(
                 }
                 is BasicResponse.Success -> {
                     if (response.data != null) {
-                        preferencesRepository.setJwt(response.data.token)
-                        preferencesRepository.setUsername(response.data.username)
-                        preferencesRepository.setUserId(response.data.userId)
+                        preferencesRepository.setValue(PreferencesRepository.TOKEN, response.data.token)
+                        preferencesRepository.setValue(PreferencesRepository.USERNAME, response.data.username)
+                        preferencesRepository.setValue(PreferencesRepository.USERID, response.data.userId)
                         client.plugin(Auth).providers
                             .filterIsInstance<BearerAuthProvider>()
                             .first().clearToken()
@@ -65,14 +64,7 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun authenticate(): Flow<BasicResponse<String>> {
         return flow {
-
-            val token = preferencesRepository.getJwt()
-            if (token.isBlank()) {
-                emit(BasicResponse.Error(UNAUTHENTICATED))
-                return@flow
-            }
-
-            val response = remote.authenticate(token)
+            val response = remote.authenticate()
             if (response is BasicResponse.Error) {
                 emit(BasicResponse.Error(response.errorMessage))
                 return@flow

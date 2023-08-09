@@ -1,6 +1,5 @@
 package com.ikuzMirel.flick.data.remote.friendRequest
 
-import com.ikuzMirel.flick.data.requests.FriendReqRequest
 import com.ikuzMirel.flick.data.requests.SendFriendReqRequest
 import com.ikuzMirel.flick.data.response.BasicResponse
 import com.ikuzMirel.flick.data.response.FriendRequestListResponse
@@ -12,22 +11,18 @@ interface FriendRequestRemote {
     ): BasicResponse<FriendRequestEntity>
 
     suspend fun cancelFriendRequest(
-        request: FriendReqRequest
+        requestId: String
     ): BasicResponse<String>
 
     suspend fun acceptFriendRequest(
-        request: FriendReqRequest
+        requestId: String
     ): BasicResponse<String>
 
     suspend fun rejectFriendRequest(
-        request: FriendReqRequest
+        requestId: String
     ): BasicResponse<String>
 
-    suspend fun getAllSentFriendRequests(
-        token: String
-    ): BasicResponse<FriendRequestListResponse>
+    suspend fun getAllSentFriendRequests(): BasicResponse<FriendRequestListResponse>
 
-    suspend fun getAllReceivedFriendRequests(
-        token: String
-    ): BasicResponse<FriendRequestListResponse>
+    suspend fun getAllReceivedFriendRequests(): BasicResponse<FriendRequestListResponse>
 }

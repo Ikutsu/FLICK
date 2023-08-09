@@ -1,6 +1,5 @@
 package com.ikuzMirel.flick.data.repositories
 
-import com.ikuzMirel.flick.data.requests.FriendReqRequest
 import com.ikuzMirel.flick.data.requests.SendFriendReqRequest
 import com.ikuzMirel.flick.data.response.BasicResponse
 import com.ikuzMirel.flick.data.response.FriendRequestListResponse
@@ -13,22 +12,18 @@ interface FriendReqRepository {
     ): Flow<BasicResponse<FriendRequestEntity>>
 
     suspend fun cancelFriendRequest(
-        request: FriendReqRequest
+        request: String
     ): Flow<BasicResponse<FriendRequestEntity>>
 
     suspend fun acceptFriendRequest(
-        request: FriendReqRequest
+        request: String
     ): Flow<BasicResponse<FriendRequestEntity>>
 
     suspend fun rejectFriendRequest(
-        request: FriendReqRequest
+        request: String
     ): Flow<BasicResponse<FriendRequestEntity>>
 
-    suspend fun getAllSentFriendRequests(
-        token: String
-    ): Flow<BasicResponse<FriendRequestListResponse>>
+    suspend fun getAllSentFriendRequests(): Flow<BasicResponse<FriendRequestListResponse>>
 
-    suspend fun getAllReceivedFriendRequests(
-        token: String
-    ): Flow<BasicResponse<FriendRequestListResponse>>
+    suspend fun getAllReceivedFriendRequests(): Flow<BasicResponse<FriendRequestListResponse>>
 }

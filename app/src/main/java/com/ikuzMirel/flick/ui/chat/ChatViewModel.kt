@@ -30,7 +30,7 @@ class ChatViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             _uiState.update {
-                it.copy(senderId = preferencesRepository.getUserId())
+                it.copy(senderId = preferencesRepository.getValue(PreferencesRepository.USERID)!!)
             }
         }
     }
