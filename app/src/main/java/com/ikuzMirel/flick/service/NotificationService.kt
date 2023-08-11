@@ -47,7 +47,7 @@ class NotificationService @Inject constructor(
                     .setContentTitle(friend.username)
                     .setContentText(data.content)
                     .setSmallIcon(R.drawable.ic_launcher_foreground)
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setContentIntent(pending)
                     .build()
 
@@ -88,7 +88,7 @@ class NotificationService @Inject constructor(
                 .setContentTitle(contextTitle)
                 .setContentText(contentText)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setContentIntent(pending)
                 .build()
 

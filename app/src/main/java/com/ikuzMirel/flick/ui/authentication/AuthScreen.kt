@@ -281,7 +281,7 @@ fun IconTitle(
     ) {
         Image(
             painter = painterResource(
-                id = R.drawable.flick_4x
+                id = R.drawable.flick_welcome_light
 //                when {
 //                    isSystemInDarkTheme() -> R.drawable.flick_4x
 //                    else -> R.drawable.flick_dark

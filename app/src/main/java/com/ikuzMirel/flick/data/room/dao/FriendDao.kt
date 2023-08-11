@@ -11,8 +11,8 @@ interface FriendDao {
     @Upsert
     fun upsertFriend(friend: FriendEntity)
 
-    @Query("SELECT * FROM friends")
-    fun getAllFriends(): Flow<List<FriendEntity>>
+    @Query("SELECT * FROM friends WHERE friend_with = :myUserId")
+    fun getAllFriends(myUserId: String): Flow<List<FriendEntity>>
 
     @Query("SELECT * FROM friends WHERE uid = :userId")
     fun getFriend(userId: String): Flow<FriendEntity>

@@ -16,6 +16,7 @@ import com.ikuzMirel.flick.data.response.BasicResponse
 import com.ikuzMirel.flick.data.room.dao.FriendDao
 import com.ikuzMirel.flick.data.room.dao.FriendReqDao
 import com.ikuzMirel.flick.data.room.dao.MessageDao
+import com.ikuzMirel.flick.domain.entities.FriendEntity
 import com.ikuzMirel.flick.domain.entities.FriendRequestEntity
 import com.ikuzMirel.flick.domain.entities.FriendRequestStatus
 import com.ikuzMirel.flick.domain.entities.MessageEntity
@@ -92,7 +93,14 @@ class WebSocketWorker @AssistedInject constructor(
                                 message.data.receiverId
                             ).first()
                             if (newFriend is BasicResponse.Success) {
-                                friendDao.upsertFriend(newFriend.data!!)
+                                val friendEntity = FriendEntity(
+                                    userId = newFriend.data!!.userId,
+                                    username = newFriend.data.username,
+                                    collectionId = newFriend.data.collectionId,
+                                    friendWith = myUserId
+                                )
+
+                                friendDao.upsertFriend(friendEntity)
                                 notificationService.showFriendRequestNotification(friendReq)
                             }
                         }

@@ -1,5 +1,6 @@
 package com.ikuzMirel.flick.ui.friendRequest
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ikuzMirel.flick.data.repositories.FriendReqRepository
@@ -8,6 +9,7 @@ import com.ikuzMirel.flick.data.repositories.UserRepository
 import com.ikuzMirel.flick.data.response.BasicResponse
 import com.ikuzMirel.flick.data.room.dao.FriendDao
 import com.ikuzMirel.flick.data.room.dao.FriendReqDao
+import com.ikuzMirel.flick.domain.entities.FriendEntity
 import com.ikuzMirel.flick.domain.entities.FriendRequestStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -37,10 +39,12 @@ class FriendRequestViewModel @Inject constructor(
     private val resultChannel = Channel<BasicResponse<String>>()
     val requestResult = resultChannel.receiveAsFlow()
 
+    private val userId = mutableStateOf("")
+
     init {
         viewModelScope.launch {
-            val userId = preferencesRepository.getValue(PreferencesRepository.USERID)!!
-            fetchFriendRequests(userId)
+            userId.value = preferencesRepository.getValue(PreferencesRepository.USERID)!!
+            fetchFriendRequests(userId.value)
         }
     }
 
@@ -91,7 +95,13 @@ class FriendRequestViewModel @Inject constructor(
 
                         if (newFriendList is BasicResponse.Success) {
                             newFriendList.data?.friends?.forEach {
-                                friendDao.upsertFriend(it)
+                                val friendEntity = FriendEntity(
+                                    userId = it.userId,
+                                    username = it.username,
+                                    collectionId = it.collectionId,
+                                    friendWith = userId.value
+                                )
+                                friendDao.upsertFriend(friendEntity)
                             }
                         }
                         resultChannel.send(BasicResponse.Success("Friend request accepted"))

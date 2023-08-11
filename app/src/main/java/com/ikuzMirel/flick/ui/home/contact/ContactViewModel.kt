@@ -2,6 +2,7 @@ package com.ikuzMirel.flick.ui.home.contact
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ikuzMirel.flick.data.repositories.PreferencesRepository
 import com.ikuzMirel.flick.data.room.dao.FriendDao
 import com.ikuzMirel.flick.domain.entities.toFriend
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ContactViewModel @Inject constructor(
-    private val friendDao: FriendDao
+    private val friendDao: FriendDao,
+    private val preferencesRepository: PreferencesRepository
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<ContactUIState> = MutableStateFlow(ContactUIState())
@@ -25,7 +27,8 @@ class ContactViewModel @Inject constructor(
             _uiState.update {
                 it.copy(isLoading = true)
             }
-            friendDao.getAllFriends().collect { friends ->
+            val myUserId = preferencesRepository.getValue(PreferencesRepository.USERID)!!
+            friendDao.getAllFriends(myUserId).collect { friends ->
                 _uiState.update { state ->
                     state.copy(
                         isLoading = false,

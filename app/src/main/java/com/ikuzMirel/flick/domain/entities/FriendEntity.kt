@@ -16,6 +16,8 @@ data class FriendEntity(
     val username: String,
     @ColumnInfo(name = "cid")
     val collectionId: String,
+    @ColumnInfo(name = "friend_with")
+    val friendWith: String,
 )
 
 fun FriendEntity.toFriend() = Friend(

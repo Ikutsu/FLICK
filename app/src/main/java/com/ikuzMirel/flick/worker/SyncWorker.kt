@@ -10,11 +10,13 @@ import androidx.work.WorkerParameters
 import com.ikuzMirel.flick.R
 import com.ikuzMirel.flick.data.repositories.ChatRepository
 import com.ikuzMirel.flick.data.repositories.FriendReqRepository
+import com.ikuzMirel.flick.data.repositories.PreferencesRepository
 import com.ikuzMirel.flick.data.repositories.UserRepository
 import com.ikuzMirel.flick.data.response.BasicResponse
 import com.ikuzMirel.flick.data.room.dao.FriendDao
 import com.ikuzMirel.flick.data.room.dao.FriendReqDao
 import com.ikuzMirel.flick.data.room.dao.MessageDao
+import com.ikuzMirel.flick.domain.entities.FriendEntity
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +29,7 @@ import kotlinx.coroutines.withContext
 class SyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
+    private val preferencesRepository: PreferencesRepository,
     private val chatRepository: ChatRepository,
     private val userRepository: UserRepository,
     private val friendReqRepository: FriendReqRepository,
@@ -64,9 +67,16 @@ class SyncWorker @AssistedInject constructor(
     private suspend fun fetchFriendListAndUpdateDB(): Boolean {
         var success = false
         val response = userRepository.getUserFriends().first()
+        val userId = preferencesRepository.getValue(PreferencesRepository.USERID)!!
         if (response is BasicResponse.Success) {
             response.data?.friends?.forEach {
-                friendDao.upsertFriend(it)
+                val friendEntity = FriendEntity(
+                    userId = it.userId,
+                    username = it.username,
+                    collectionId = it.collectionId,
+                    friendWith = userId
+                )
+                friendDao.upsertFriend(friendEntity)
             }
             success = true
         }
