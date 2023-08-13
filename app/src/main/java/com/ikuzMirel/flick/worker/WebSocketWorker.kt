@@ -13,13 +13,14 @@ import com.ikuzMirel.flick.data.remote.websocket.WebSocketApi
 import com.ikuzMirel.flick.data.repositories.PreferencesRepository
 import com.ikuzMirel.flick.data.repositories.UserRepository
 import com.ikuzMirel.flick.data.response.BasicResponse
+import com.ikuzMirel.flick.data.response.MessageResponse
+import com.ikuzMirel.flick.data.response.toMessageEntity
 import com.ikuzMirel.flick.data.room.dao.FriendDao
 import com.ikuzMirel.flick.data.room.dao.FriendReqDao
 import com.ikuzMirel.flick.data.room.dao.MessageDao
 import com.ikuzMirel.flick.domain.entities.FriendEntity
 import com.ikuzMirel.flick.domain.entities.FriendRequestEntity
 import com.ikuzMirel.flick.domain.entities.FriendRequestStatus
-import com.ikuzMirel.flick.domain.entities.MessageEntity
 import com.ikuzMirel.flick.service.NotificationService
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -79,9 +80,13 @@ class WebSocketWorker @AssistedInject constructor(
             println(message.data)
             when (message.type) {
                 "chatMessage" -> {
-                    messageDao.upsertMessage(message.data as MessageEntity)
-                    if (message.data.senderUid != myUserId) {
-                        notificationService.showChatNotification(message.data)
+                    val messageEntity = (message.data as MessageResponse).toMessageEntity()
+                    messageDao.upsertMessage(messageEntity)
+                    friendDao.getFriendWithCID(messageEntity.collectionId).first().let {
+                        friendDao.upsertFriend(it.copy(latestMessage = messageEntity.content))
+                    }
+                    if (messageEntity.senderUid != myUserId) {
+                        notificationService.showChatNotification(messageEntity)
                     }
                 }
 
@@ -97,7 +102,8 @@ class WebSocketWorker @AssistedInject constructor(
                                     userId = newFriend.data!!.userId,
                                     username = newFriend.data.username,
                                     collectionId = newFriend.data.collectionId,
-                                    friendWith = myUserId
+                                    friendWith = myUserId,
+                                    latestMessage = "",
                                 )
 
                                 friendDao.upsertFriend(friendEntity)

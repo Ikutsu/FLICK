@@ -4,8 +4,8 @@ import com.ikuzMirel.flick.data.model.UserData
 import com.ikuzMirel.flick.data.remote.user.UserRemote
 import com.ikuzMirel.flick.data.response.BasicResponse
 import com.ikuzMirel.flick.data.response.FriendListResponse
+import com.ikuzMirel.flick.data.response.FriendResponse
 import com.ikuzMirel.flick.data.response.UserListResponse
-import com.ikuzMirel.flick.domain.entities.FriendEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -28,7 +28,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun getUserFriend(
         friendUserId: String
-    ): Flow<BasicResponse<FriendEntity>> {
+    ): Flow<BasicResponse<FriendResponse>> {
         return flow {
             when (val response = remote.getUserFriend(friendUserId)) {
                 is BasicResponse.Error -> {

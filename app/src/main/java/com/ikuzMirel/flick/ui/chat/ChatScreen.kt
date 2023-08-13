@@ -1,6 +1,12 @@
 package com.ikuzMirel.flick.ui.chat
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.InfiniteTransition
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -18,6 +24,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
@@ -33,6 +40,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ikuzMirel.flick.R
 import com.ikuzMirel.flick.domain.model.Message
+import com.ikuzMirel.flick.domain.model.MessageState
 import com.ikuzMirel.flick.ui.components.icons.SendOutlined
 import com.ikuzMirel.flick.ui.components.textFields.UserInputTextField
 import com.ikuzMirel.flick.ui.extension.noRippleClickable
@@ -60,10 +68,11 @@ fun Chat(
     val lifecycleOwner = LocalLifecycleOwner.current
     val scrollState = rememberLazyListState()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val infiniteTransition = rememberInfiniteTransition()
 
-    DisposableEffect(key1 = lifecycleOwner){
+    DisposableEffect(key1 = lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_START){
+            if (event == Lifecycle.Event.ON_START) {
                 viewModel.getChatMessages(collectionId)
             }
         }
@@ -96,11 +105,15 @@ fun Chat(
                     .fillMaxSize()
             ) {
                 Content(
+                    viewModel = viewModel,
                     messages = state.messages,
                     modifier = Modifier
                         .weight(1f),
                     scrollState = scrollState,
-                    state = state
+                    state = state,
+                    infiniteTransition = infiniteTransition,
+                    collectionId = collectionId,
+                    receiverId = userId,
                 )
                 ChatBottomBar(viewModel, state, collectionId, userId)
             }
@@ -111,12 +124,28 @@ fun Chat(
 
 @Composable
 private fun Content(
+    viewModel: ChatViewModel,
     messages: List<Message>,
     modifier: Modifier,
     scrollState: LazyListState,
-    state: ChatUIState
+    state: ChatUIState,
+    infiniteTransition: InfiniteTransition,
+    collectionId: String,
+    receiverId: String,
 ) {
+    val pulseAnim by infiniteTransition.animateFloat(
+        initialValue = 0.8f,
+        targetValue = 0.2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 1000
+            ),
+            RepeatMode.Reverse
+        )
+    )
+
     Box(modifier = modifier) {
+
         LazyColumn(
             modifier = Modifier.wrapContentSize(),
             state = scrollState,
@@ -126,8 +155,12 @@ private fun Content(
         ) {
             items(messages) {
                 Message(
+                    viewModel = viewModel,
                     userMe = state.senderId,
-                    massage = it
+                    message = it,
+                    transition = pulseAnim,
+                    collectionId = collectionId,
+                    receiverId = receiverId
                 )
             }
         }
@@ -137,10 +170,14 @@ private fun Content(
 
 @Composable
 fun Message(
+    viewModel: ChatViewModel,
+    collectionId: String,
+    receiverId: String,
     userMe: String,
-    massage: Message
+    message: Message,
+    transition: Float
 ) {
-    val isOwnMessage = massage.userId == userMe
+    val isOwnMessage = message.userId == userMe
     val (showTime, setShowTime) = remember {
         mutableStateOf(false)
     }
@@ -152,13 +189,29 @@ fun Message(
             horizontalArrangement = Arrangement.End
         ) {
             Column(
-                modifier = Modifier
-                    .background(Purple50, RoundedCornerShape(12.dp))
-                    .noRippleClickable { setShowTime(!showTime) }
-                    .animateContentSize()
+                modifier = when (message.state) {
+                    MessageState.SENDING.name -> Modifier
+                        .alpha(transition)
+                        .background(Purple50, RoundedCornerShape(12.dp))
+                    MessageState.SENT.name -> Modifier
+                        .background(Purple50, RoundedCornerShape(12.dp))
+                        .noRippleClickable { setShowTime(!showTime) }
+                        .animateContentSize()
+                    MessageState.ERROR.name -> Modifier
+                        .background(Purple50, RoundedCornerShape(12.dp))
+                        .border(2.dp, Red70, RoundedCornerShape(12.dp))
+                        .noRippleClickable {
+                            viewModel.resendMessage(
+                                message,
+                                collectionId,
+                                receiverId
+                            )
+                        }
+                    else -> Modifier
+                }
             ) {
                 Text(
-                    text = massage.content,
+                    text = message.content,
                     color = Color.White,
                     modifier = Modifier
                         .padding(
@@ -171,7 +224,7 @@ fun Message(
                 )
                 if (showTime) {
                     Text(
-                        text = massage.timestamp,
+                        text = message.timestamp,
                         color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 12.sp,
                         modifier = Modifier
@@ -208,7 +261,7 @@ fun Message(
                     .animateContentSize()
             ) {
                 Text(
-                    text = massage.content,
+                    text = message.content,
                     color = Color.White,
                     modifier = Modifier
                         .padding(
@@ -221,7 +274,7 @@ fun Message(
                 )
                 if (showTime) {
                     Text(
-                        text = massage.timestamp,
+                        text = message.timestamp,
                         color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 12.sp,
                         modifier = Modifier
@@ -254,10 +307,12 @@ fun TitleAvatarTopBar(
                 )
             }
         },
-        title = { Text(
-            text = username,
-            fontFamily = museoRegular
-        ) },
+        title = {
+            Text(
+                text = username,
+                fontFamily = museoRegular
+            )
+        },
         actions = {
             IconButton(
                 onClick = { /*TODO*/ }

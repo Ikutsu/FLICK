@@ -19,4 +19,7 @@ interface FriendDao {
 
     @Query("SELECT cid FROM friends")
     fun getAllFriendsCIDs(): Flow<List<String>>
+
+    @Query("SELECT * FROM friends WHERE cid = :cid")
+    fun getFriendWithCID(cid: String): Flow<FriendEntity>
 }

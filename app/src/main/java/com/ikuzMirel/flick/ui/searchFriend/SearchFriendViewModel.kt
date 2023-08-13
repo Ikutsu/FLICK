@@ -60,7 +60,10 @@ class SearchFriendViewModel @Inject constructor(
                 when (response) {
                     is BasicResponse.Success -> {
                         _uiState.update {
-                            it.copy(searchResults = response.data?.users!!)
+                            it.copy(
+                                searchResults = response.data?.users!!,
+                                showEmptyState = response.data.users.isEmpty()
+                            )
                         }
                     }
 

@@ -1,8 +1,8 @@
 package com.ikuzMirel.flick.data.serializer
 
+import com.ikuzMirel.flick.data.response.MessageResponse
 import com.ikuzMirel.flick.data.response.WebSocketResponse
 import com.ikuzMirel.flick.domain.entities.FriendRequestEntity
-import com.ikuzMirel.flick.domain.entities.MessageEntity
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
@@ -25,7 +25,7 @@ object WebSocketMsgSerializer : KSerializer<WebSocketResponse> {
 
     @Suppress("UNCHECKED_CAST")
     private val typeSerializer: Map<String, KSerializer<Any>> = mapOf(
-        "chatMessage" to serializer<MessageEntity>(),
+        "chatMessage" to serializer<MessageResponse>(),
         "friendRequest" to serializer<FriendRequestEntity>(),
     ).mapValues { (_, v) -> v as KSerializer<Any> }
 

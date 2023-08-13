@@ -11,6 +11,6 @@ interface MessageDao {
     @Upsert
     fun upsertMessage(message: MessageEntity)
 
-    @Query("SELECT * FROM messages WHERE cid = :cid ORDER BY timestamp DESC")
+    @Query("SELECT * FROM messages WHERE cid = :cid ")
     fun getMessages(cid: String): Flow<List<MessageEntity>>
 }

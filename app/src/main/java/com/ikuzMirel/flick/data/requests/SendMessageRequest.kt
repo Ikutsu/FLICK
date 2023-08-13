@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 data class SendMessageRequest(
     val message: String,
     val cid: String,
-    val receiverId: String
+    val receiverId: String,
+    val id: String
 )

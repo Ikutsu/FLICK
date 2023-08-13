@@ -9,9 +9,9 @@ import com.ikuzMirel.flick.data.constants.USER_NOT_EXIST
 import com.ikuzMirel.flick.data.model.UserData
 import com.ikuzMirel.flick.data.response.BasicResponse
 import com.ikuzMirel.flick.data.response.FriendListResponse
+import com.ikuzMirel.flick.data.response.FriendResponse
 import com.ikuzMirel.flick.data.response.UserListResponse
 import com.ikuzMirel.flick.data.response.processHttpResponse
-import com.ikuzMirel.flick.domain.entities.FriendEntity
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
@@ -39,7 +39,7 @@ class UserRemoteImpl @Inject constructor(
 
     override suspend fun getUserFriend(
         friendUserId: String
-    ): BasicResponse<FriendEntity> {
+    ): BasicResponse<FriendResponse> {
         return processHttpResponse(
             request = client.get(ENDPOINT_USER_FRIEND) {
                 parameter("friendId", friendUserId)

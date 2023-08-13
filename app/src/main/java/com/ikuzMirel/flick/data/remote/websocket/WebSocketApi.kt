@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface WebSocketApi {
     suspend fun connectToSocket(userId: String): BasicResponse<String>
     suspend fun disconnectFromSocket()
-    suspend fun sendMessage(message: String)
+    suspend fun sendMessage(message: String): BasicResponse<String>
     fun receiveMessage(): Flow<WebSocketResponse>
     fun checkConnection(): Boolean
 }

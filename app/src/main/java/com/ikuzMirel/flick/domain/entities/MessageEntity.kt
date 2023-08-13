@@ -20,11 +20,15 @@ data class MessageEntity(
     @ColumnInfo(name = "timestamp")
     val timestamp: Long,
     @ColumnInfo(name = "cid")
-    val collectionId: String
+    val collectionId: String,
+    @ColumnInfo(name = "state")
+    val state: String
 )
 
 fun MessageEntity.toMessage() = Message(
     content = content,
     userId = senderUid,
-    timestamp = timestamp.toDate()
+    timestamp = timestamp.toDate(),
+    id = id,
+    state = state
 )

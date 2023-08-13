@@ -1,6 +1,7 @@
 package com.ikuzMirel.flick.ui.searchFriend
 
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -11,6 +12,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.PersonAddAlt
+import androidx.compose.material.icons.outlined.QuestionMark
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ikuzMirel.flick.data.response.BasicResponse
+import com.ikuzMirel.flick.ui.components.emptyState.SimpleEmptyStateScreen
 import com.ikuzMirel.flick.ui.components.listItem.FriendReqListItem
 import com.ikuzMirel.flick.ui.components.listItem.FriendRequestItemType
 import com.ikuzMirel.flick.ui.components.textFields.UserInputTextField
@@ -126,30 +129,48 @@ fun AddFriend(
                 actionIcon = Icons.Outlined.Search,
                 onActionClick = {},
             )
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                items(state.searchResults){ result ->
-                    FriendReqListItem(
-                        name = result.username,
-                        onClick = {
-                            when (result.friendWithMe) {
-                                true -> {
-                                    navigator.navigate(ChatDestination(result.username, result.userId, result.collectionId))
+            Box {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    items(state.searchResults) { result ->
+                        FriendReqListItem(
+                            name = result.username,
+                            onClick = {
+                                when (result.friendWithMe) {
+                                    true -> {
+                                        navigator.navigate(
+                                            ChatDestination(
+                                                result.username,
+                                                result.userId,
+                                                result.collectionId
+                                            )
+                                        )
+                                    }
+
+                                    false -> {
+                                        viewModel.onAddFriendClicked(result.userId)
+                                    }
                                 }
-                                false -> {
-                                    viewModel.onAddFriendClicked(result.userId)
-                                }
+                            },
+                            type = if (result.friendWithMe) {
+                                FriendRequestItemType.Friend
+                            } else {
+                                FriendRequestItemType.Add
                             }
-                        },
-                        type = if (result.friendWithMe) {
-                            FriendRequestItemType.Friend
-                        } else {
-                            FriendRequestItemType.Add
-                        }
+                        )
+                    }
+                }
+                if (state.showEmptyState) {
+                    SimpleEmptyStateScreen(
+                        icon = Icons.Outlined.QuestionMark,
+                        title = "Couldn't Find User :(",
+                        description = "The user you were searching for doesn't exist. Please check the name again and try searching.",
+                        buttonShow = false,
+                        descriptionModifier = Modifier.padding(horizontal = 32.dp)
                     )
                 }
             }

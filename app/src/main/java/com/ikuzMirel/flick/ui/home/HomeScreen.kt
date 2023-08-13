@@ -27,6 +27,7 @@ import com.ikuzMirel.flick.ui.destinations.SettingDestination
 import com.ikuzMirel.flick.ui.home.contact.Contact
 import com.ikuzMirel.flick.ui.home.feed.Feed
 import com.ikuzMirel.flick.ui.home.map.Map
+import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -40,7 +41,13 @@ enum class Screens(val icon: ImageVector, val contentDescription: String) {
 
 @RootNavGraph(start = true)
 @OptIn(ExperimentalFoundationApi::class)
-@Destination
+@Destination(
+    deepLinks = [
+        DeepLink(
+            uriPattern = "https://flick.com/home"
+        )
+    ]
+)
 @Composable
 fun Home(
     navigator: DestinationsNavigator

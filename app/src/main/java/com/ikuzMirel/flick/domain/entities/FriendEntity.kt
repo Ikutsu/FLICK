@@ -18,13 +18,15 @@ data class FriendEntity(
     val collectionId: String,
     @ColumnInfo(name = "friend_with")
     val friendWith: String,
+    @ColumnInfo(name = "latest_message")
+    val latestMessage: String,
 )
 
 fun FriendEntity.toFriend() = Friend(
     name = username,
     userId = userId,
     collectionId = collectionId,
-    latestMessage = "Hellow UWU",
+    latestMessage = latestMessage,
     notification = 0,
     status = 1
 )

@@ -59,7 +59,7 @@ class FriendRequestViewModel @Inject constructor(
                             )
                         }
                     }
-                } else {
+                } else if (it.senderId == userId) {
                     _uiState.update { uiState ->
                         uiState.copy(
                             sentRequests = uiState.sentRequests + it
@@ -99,7 +99,8 @@ class FriendRequestViewModel @Inject constructor(
                                     userId = it.userId,
                                     username = it.username,
                                     collectionId = it.collectionId,
-                                    friendWith = userId.value
+                                    friendWith = userId.value,
+                                    latestMessage = ""
                                 )
                                 friendDao.upsertFriend(friendEntity)
                             }

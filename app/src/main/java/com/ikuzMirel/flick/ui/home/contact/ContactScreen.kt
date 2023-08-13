@@ -16,6 +16,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,6 +36,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ikuzMirel.flick.R
 import com.ikuzMirel.flick.domain.model.Friend
+import com.ikuzMirel.flick.ui.components.emptyState.SimpleEmptyStateScreen
+import com.ikuzMirel.flick.ui.destinations.AddFriendDestination
 import com.ikuzMirel.flick.ui.destinations.ChatDestination
 import com.ikuzMirel.flick.ui.theme.Amber40
 import com.ikuzMirel.flick.ui.theme.Green70
@@ -48,18 +52,32 @@ fun Contact(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit) {
         viewModel.getFriends()
     }
 
-    LazyColumn(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 64.dp)
     ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 64.dp)
+        ) {
 
-        items(state.friends) {
-            ContactListItem(it, navigator)
+            items(state.friends) {
+                ContactListItem(it, navigator)
+            }
+        }
+        if (state.showEmptyState) {
+            SimpleEmptyStateScreen(
+                icon = Icons.Outlined.Group,
+                title = "You Don’t Have Any Friends!",
+                description = "Why? Go add some now! FAST!",
+                buttonText = "Add Friends",
+                onButtonClick = { navigator.navigate(AddFriendDestination) }
+            )
         }
     }
 }

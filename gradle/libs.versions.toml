@@ -27,6 +27,8 @@ maps = "2.11.4"
 
 coil = "2.4.0"
 
+bson = "4.10.1"
+
 accompanist = "0.30.1"
 
 ktor = "2.3.1"
@@ -115,6 +117,9 @@ ktor-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = 
 ktor-contentNegotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-auth = { group = "io.ktor", name = "ktor-client-auth", version.ref = "ktor" }
+
+# MongoDB Bson #
+bson = { group = "org.mongodb", name = "bson", version.ref = "bson" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit-junit" }
 ui-testJunit4 = { module = "androidx.compose.ui:ui-test-junit4" }

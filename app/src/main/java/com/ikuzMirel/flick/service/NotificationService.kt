@@ -16,6 +16,7 @@ import com.ikuzMirel.flick.domain.entities.MessageEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,11 +28,12 @@ class NotificationService @Inject constructor(
     private val serviceJob = SupervisorJob()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
 
-    private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     fun showChatNotification(data: MessageEntity) {
         serviceScope.launch {
-            friendDao.getFriend(data.senderUid).collect{ friend ->
+            friendDao.getFriend(data.senderUid).collect { friend ->
                 val deeplinkIntent = Intent(
                     Intent.ACTION_VIEW,
                     "https://flick.com/chat/${friend.username}/${friend.userId}/${friend.collectionId}".toUri(),
@@ -40,7 +42,10 @@ class NotificationService @Inject constructor(
                 )
                 val pending: PendingIntent = TaskStackBuilder.create(context).run {
                     addNextIntentWithParentStack(deeplinkIntent)
-                    getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                    getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
                 }
 
                 val notification = NotificationCompat.Builder(context, "flick_msg_channel")
@@ -56,28 +61,55 @@ class NotificationService @Inject constructor(
         }
     }
 
-    fun showFriendRequestNotification(friendRequest: FriendRequestEntity){
+    fun showFriendRequestNotification(friendRequest: FriendRequestEntity) {
         serviceScope.launch {
 
-            val deeplinkIntent = Intent(
-                Intent.ACTION_VIEW,
-                "https://flick.com/FriendRequest".toUri(),
-                context,
-                MainActivity::class.java
-            )
+            val deeplinkIntent = when (friendRequest.status) {
+                FriendRequestStatus.PENDING.name -> {
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        "https://flick.com/FriendRequest".toUri(),
+                        context,
+                        MainActivity::class.java
+                    )
+                }
+                FriendRequestStatus.ACCEPTED.name -> {
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        "https://flick.com/chat/${friendRequest.receiverName}/${friendRequest.receiverId}/${
+                            friendDao.getFriend(
+                                friendRequest.receiverId
+                            ).first().collectionId
+                        }".toUri(),
+                        context,
+                        MainActivity::class.java
+                    )
+                }
+                else -> {
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        "https://flick.com/home".toUri(),
+                        context,
+                        MainActivity::class.java
+                    )
+                }
+            }
             val pending: PendingIntent = TaskStackBuilder.create(context).run {
                 addNextIntentWithParentStack(deeplinkIntent)
-                getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                getPendingIntent(
+                    0,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
             }
 
-            val contextTitle = when(friendRequest.status){
+            val contextTitle = when (friendRequest.status) {
                 FriendRequestStatus.PENDING.name -> "New friend request"
                 FriendRequestStatus.ACCEPTED.name -> "New friend"
                 FriendRequestStatus.REJECTED.name -> "Friend request rejected"
                 else -> ""
             }
 
-            val contentText = when(friendRequest.status){
+            val contentText = when (friendRequest.status) {
                 FriendRequestStatus.PENDING.name -> "You have a new friend request"
                 FriendRequestStatus.ACCEPTED.name -> "You are now friends with ${friendRequest.receiverName}"
                 FriendRequestStatus.REJECTED.name -> "Your friend request was rejected"

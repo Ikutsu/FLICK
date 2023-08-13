@@ -1,6 +1,7 @@
 package com.ikuzMirel.flick.ui.home.feed
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.outlined.Construction
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
@@ -29,22 +31,43 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ikuzMirel.flick.R
+import com.ikuzMirel.flick.ui.components.emptyState.SimpleEmptyStateScreen
 
 // TODO: Hardcoded data source, change when viewModel is created
 
 @Composable
 fun Feed() {
-    LazyColumn(
+    val showWIP = remember {
+        mutableStateOf(true)
+    }
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 64.dp)
-    ){
-        items(5){
-            FeedItem(
-                user = "Xuan",
-                game = "Valorant",
-                isLikeClicked = {},
-                isCommentClicked = {}
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 64.dp)
+        ) {
+            items(5) {
+                FeedItem(
+                    user = "Xuan",
+                    game = "Valorant",
+                    isLikeClicked = {},
+                    isCommentClicked = {}
+                )
+            }
+        }
+        if (showWIP.value){
+            SimpleEmptyStateScreen(
+                icon = Icons.Outlined.Construction,
+                title = "Work In Progress",
+                description = "",
+                buttonText = "See preview",
+                onButtonClick = {
+                    showWIP.value = false
+                }
             )
         }
     }

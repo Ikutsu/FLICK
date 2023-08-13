@@ -34,7 +34,8 @@ class ContactViewModel @Inject constructor(
                         isLoading = false,
                         friends = friends.map {
                             it.toFriend()
-                        }
+                        },
+                        showEmptyState = friends.isEmpty()
                     )
                 }
             }

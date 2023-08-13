@@ -134,6 +134,9 @@ dependencies {
     //DataStore
     implementation (libs.datastore)
 
+    //Bson
+    implementation (libs.bson)
+
     //Testing
     testImplementation (libs.junit)
     androidTestImplementation (libs.junit.ext)

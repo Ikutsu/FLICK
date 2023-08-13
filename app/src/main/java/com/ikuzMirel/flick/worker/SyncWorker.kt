@@ -13,6 +13,7 @@ import com.ikuzMirel.flick.data.repositories.FriendReqRepository
 import com.ikuzMirel.flick.data.repositories.PreferencesRepository
 import com.ikuzMirel.flick.data.repositories.UserRepository
 import com.ikuzMirel.flick.data.response.BasicResponse
+import com.ikuzMirel.flick.data.response.toMessageEntity
 import com.ikuzMirel.flick.data.room.dao.FriendDao
 import com.ikuzMirel.flick.data.room.dao.FriendReqDao
 import com.ikuzMirel.flick.data.room.dao.MessageDao
@@ -48,8 +49,10 @@ class SyncWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
 
         val syncSuccess = awaitAll(
-            async { fetchFriendListAndUpdateDB() },
-            async { fetchMessagesAndUpdateDB() },
+            async {
+                fetchFriendListAndUpdateDB()
+                fetchMessagesAndUpdateDB()
+                  },
             async { fetchFriendRequestsAndUpdateDB() }
         ).all { it }
 
@@ -74,7 +77,8 @@ class SyncWorker @AssistedInject constructor(
                     userId = it.userId,
                     username = it.username,
                     collectionId = it.collectionId,
-                    friendWith = userId
+                    friendWith = userId,
+                    latestMessage = ""
                 )
                 friendDao.upsertFriend(friendEntity)
             }
@@ -90,11 +94,14 @@ class SyncWorker @AssistedInject constructor(
             success = true
         } else {
             for (cid in cids) {
+                val friend = friendDao.getFriendWithCID(cid).first()
                 val result = chatRepository.getChatMassages(cid).first()
                 if (result is BasicResponse.Success) {
                     result.data?.messages?.forEach {
-                        messageDao.upsertMessage(it)
+                        messageDao.upsertMessage(it.toMessageEntity())
                     }
+                    friend.copy(latestMessage = result.data?.messages?.last()?.content ?: "")
+                        .let { friendDao.upsertFriend(it) }
                     success = true
                 }
             }
