@@ -13,11 +13,12 @@ data class MessageResponse(
     val collectionId: String,
 )
 
-fun MessageResponse.toMessageEntity() = MessageEntity(
+fun MessageResponse.toMessageEntity(unread: Boolean) = MessageEntity(
     id = id,
     content = content,
     senderUid = senderUid,
     timestamp = timestamp,
     collectionId = collectionId,
-    state = MessageState.SENT.name
+    state = MessageState.SENT.name,
+    unread = unread
 )

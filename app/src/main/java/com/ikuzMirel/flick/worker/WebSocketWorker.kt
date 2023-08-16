@@ -80,12 +80,17 @@ class WebSocketWorker @AssistedInject constructor(
             println(message.data)
             when (message.type) {
                 "chatMessage" -> {
-                    val messageEntity = (message.data as MessageResponse).toMessageEntity()
+                    val messageEntity = (message.data as MessageResponse).toMessageEntity(
+                        message.data.senderUid != myUserId
+                    )
                     messageDao.upsertMessage(messageEntity)
                     friendDao.getFriendWithCID(messageEntity.collectionId).first().let {
                         friendDao.upsertFriend(it.copy(latestMessage = messageEntity.content))
                     }
+
+                    val friendEntity = friendDao.getFriendWithCID(messageEntity.collectionId).first()
                     if (messageEntity.senderUid != myUserId) {
+                        friendDao.upsertFriend(friendEntity.copy(unreadCount = friendEntity.unreadCount + 1))
                         notificationService.showChatNotification(messageEntity)
                     }
                 }
@@ -104,6 +109,7 @@ class WebSocketWorker @AssistedInject constructor(
                                     collectionId = newFriend.data.collectionId,
                                     friendWith = myUserId,
                                     latestMessage = "",
+                                    unreadCount = 0
                                 )
 
                                 friendDao.upsertFriend(friendEntity)

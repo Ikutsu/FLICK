@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.Flow
 interface FriendDao {
     @Upsert
     fun upsertFriend(friend: FriendEntity)
-
     @Query("SELECT * FROM friends WHERE friend_with = :myUserId")
     fun getAllFriends(myUserId: String): Flow<List<FriendEntity>>
 
@@ -22,4 +21,7 @@ interface FriendDao {
 
     @Query("SELECT * FROM friends WHERE cid = :cid")
     fun getFriendWithCID(cid: String): Flow<FriendEntity>
+
+    @Query("UPDATE friends SET unread_count = :unreadCount WHERE uid = :userId")
+    fun updateUnreadCount(userId: String, unreadCount: Int)
 }

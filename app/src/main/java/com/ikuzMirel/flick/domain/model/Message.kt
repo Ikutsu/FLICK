@@ -7,7 +7,8 @@ data class Message(
     val userId: String,
     val timestamp: String,
     val id: String,
-    val state: String
+    val state: String,
+    val unread: Boolean
 )
 
 fun Message.toMessageEntity(
@@ -19,7 +20,8 @@ fun Message.toMessageEntity(
     senderUid = userId,
     timestamp = timestamp,
     collectionId = collectionId,
-    state = state
+    state = state,
+    unread = unread
 )
 enum class MessageState {
     SENDING,

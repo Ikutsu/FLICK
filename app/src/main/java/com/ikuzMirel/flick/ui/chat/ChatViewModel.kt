@@ -80,7 +80,8 @@ class ChatViewModel @Inject constructor(
                     _uiState.value.senderId,
                     timestamp.toDate(),
                     request.id,
-                    MessageState.SENDING.name
+                    MessageState.SENDING.name,
+                    false
                 )
                 messageDao.upsertMessage(message.toMessageEntity(timestamp, collectionId))
 
@@ -154,6 +155,12 @@ class ChatViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    fun markMessageAsRead(id: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            messageDao.updateUnreadMessages(id)
         }
     }
 }

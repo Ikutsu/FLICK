@@ -161,7 +161,7 @@ fun ContactListItem(
             )
         }
 
-        if (friend.notification != 0) {
+        if (friend.unreadCount != 0) {
             Column(
                 modifier = Modifier
                     .padding(
@@ -170,7 +170,7 @@ fun ContactListItem(
                     .background(
                         color = Color.Red,
                         shape = when {
-                            friend.notification > 9 -> RoundedCornerShape(50)
+                            friend.unreadCount > 9 -> RoundedCornerShape(50)
                             else -> RoundedCornerShape(100)
                         }
                     ),
@@ -180,8 +180,8 @@ fun ContactListItem(
             ) {
                 Text(
                     text = when {
-                        friend.notification > 99 -> "99+"
-                        else -> friend.notification.toString()
+                        friend.unreadCount > 99 -> "99+"
+                        else -> friend.unreadCount.toString()
                     },
                     fontSize = 12.sp,
                     color = Color.White,

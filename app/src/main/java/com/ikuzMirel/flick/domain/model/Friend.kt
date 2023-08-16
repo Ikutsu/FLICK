@@ -7,5 +7,5 @@ data class Friend(
     val userId: String,
     val collectionId: String,
     val latestMessage: String,
-    val notification: Int
+    val unreadCount: Int
 )

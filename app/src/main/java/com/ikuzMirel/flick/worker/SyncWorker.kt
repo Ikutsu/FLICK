@@ -1,6 +1,7 @@
 package com.ikuzMirel.flick.worker
 
 import android.content.Context
+import android.database.sqlite.SQLiteConstraintException
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
@@ -78,7 +79,8 @@ class SyncWorker @AssistedInject constructor(
                     username = it.username,
                     collectionId = it.collectionId,
                     friendWith = userId,
-                    latestMessage = ""
+                    latestMessage = "",
+                    unreadCount = 0
                 )
                 friendDao.upsertFriend(friendEntity)
             }
@@ -90,6 +92,7 @@ class SyncWorker @AssistedInject constructor(
     private suspend fun fetchMessagesAndUpdateDB(): Boolean {
         var success = false
         val cids = friendDao.getAllFriendsCIDs().first()
+        val myUserId = preferencesRepository.getValue(PreferencesRepository.USERID)!!
         if (cids.isEmpty()) {
             success = true
         } else {
@@ -98,10 +101,25 @@ class SyncWorker @AssistedInject constructor(
                 val result = chatRepository.getChatMassages(cid).first()
                 if (result is BasicResponse.Success) {
                     result.data?.messages?.forEach {
-                        messageDao.upsertMessage(it.toMessageEntity())
+                        try {
+                            if (it.senderUid == myUserId) {
+                                messageDao.insertMessage(it.toMessageEntity(unread = false))
+                            } else {
+                                messageDao.insertMessage(it.toMessageEntity(unread = true))
+                            }
+                        } catch (e: SQLiteConstraintException) {
+                            if (it.senderUid == myUserId) {
+                                messageDao.updateMessage(it.toMessageEntity(unread = false))
+                            }
+                        }
                     }
-                    friend.copy(latestMessage = result.data?.messages?.last()?.content ?: "")
-                        .let { friendDao.upsertFriend(it) }
+                    val latestMessage = messageDao.getLatestMessage(cid)?.content ?: ""
+                    val unreadCount = messageDao.getUnreadMessages(cid).first().size
+                    println("unreadCount: $unreadCount")
+                    friend.copy(
+                        latestMessage = latestMessage,
+                        unreadCount = unreadCount
+                    ).let { friendDao.upsertFriend(it) }
                     success = true
                 }
             }

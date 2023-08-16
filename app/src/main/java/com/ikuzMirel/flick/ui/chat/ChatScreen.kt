@@ -154,6 +154,12 @@ private fun Content(
                 .asPaddingValues()
         ) {
             items(messages) {
+                LaunchedEffect(true){
+                    if (it.unread) {
+                        viewModel.markMessageAsRead(it.id)
+                    }
+                }
+
                 Message(
                     viewModel = viewModel,
                     userMe = state.senderId,

@@ -22,7 +22,9 @@ data class MessageEntity(
     @ColumnInfo(name = "cid")
     val collectionId: String,
     @ColumnInfo(name = "state")
-    val state: String
+    val state: String,
+    @ColumnInfo(name = "unread")
+    val unread: Boolean,
 )
 
 fun MessageEntity.toMessage() = Message(
@@ -30,5 +32,6 @@ fun MessageEntity.toMessage() = Message(
     userId = senderUid,
     timestamp = timestamp.toDate(),
     id = id,
-    state = state
+    state = state,
+    unread = unread
 )
