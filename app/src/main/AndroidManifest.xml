@@ -35,10 +35,10 @@
                 android:value="" />
 
         </activity>
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="${mapAPI}">
-        </meta-data>
+<!--        <meta-data-->
+<!--            android:name="com.google.android.geo.API_KEY"-->
+<!--            android:value="${mapAPI}">-->
+<!--        </meta-data>-->
         <receiver
             android:name=".receiver.BootCompletedReceiver"
             android:exported="false">

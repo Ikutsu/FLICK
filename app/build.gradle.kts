@@ -95,8 +95,8 @@ dependencies {
     implementation (libs.material.icons)
 
     //Google map
-    implementation (libs.maps)
-    implementation (libs.maps.compose)
+//    implementation (libs.maps)
+//    implementation (libs.maps.compose)
 
     //Coil
     implementation (libs.coil)
