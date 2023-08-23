@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/assets/images/icon.png" width="200"></p>
+<p align="center"><img src="docs/images/icon.png" width="200"></p>
 <h1 align="center"><b>FLICK</b></h1>
 <h3 align="center">Build your own IM application. Fast and simple!</h3>
 
