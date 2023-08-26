@@ -22,6 +22,9 @@ interface FriendDao {
     @Query("SELECT * FROM friends WHERE cid = :cid")
     fun getFriendWithCID(cid: String): Flow<FriendEntity>
 
+    @Query("SELECT cid FROM friends WHERE uid = :userId")
+    fun getCidWithUserId(userId: String): String
+
     @Query("UPDATE friends SET unread_count = :unreadCount WHERE uid = :userId")
     fun updateUnreadCount(userId: String, unreadCount: Int)
 }

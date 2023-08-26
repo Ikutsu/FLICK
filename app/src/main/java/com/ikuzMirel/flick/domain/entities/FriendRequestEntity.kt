@@ -9,7 +9,7 @@ enum class FriendRequestStatus {
     PENDING,
     ACCEPTED,
     REJECTED,
-    CANCELLED
+    CANCELED
 }
 
 @Serializable

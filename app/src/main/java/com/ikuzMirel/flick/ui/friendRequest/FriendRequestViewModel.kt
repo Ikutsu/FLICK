@@ -17,10 +17,12 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -49,21 +51,23 @@ class FriendRequestViewModel @Inject constructor(
     }
 
     private suspend fun fetchFriendRequests(userId: String) {
-        friendReqDao.getAllFriendReqs().collect { result ->
-            result.forEach {
-                if (it.receiverId == userId) {
-                    if (it.status == FriendRequestStatus.PENDING.name) {
+        friendReqDao.getAllFriendReqs().distinctUntilChanged().collect { result ->
+            result.forEach { entity ->
+                if (entity.receiverId == userId && entity.status == FriendRequestStatus.PENDING.name) {
+                    _uiState.value.receivedRequests.find { it.id == entity.id } ?: run{
                         _uiState.update { uiState ->
                             uiState.copy(
-                                receivedRequests = uiState.receivedRequests + it
+                                receivedRequests = uiState.receivedRequests + entity
                             )
                         }
                     }
-                } else if (it.senderId == userId) {
-                    _uiState.update { uiState ->
-                        uiState.copy(
-                            sentRequests = uiState.sentRequests + it
-                        )
+                } else if (entity.senderId == userId) {
+                    _uiState.value.sentRequests.find { it.id == entity.id } ?: run{
+                        _uiState.update { uiState ->
+                            uiState.copy(
+                                sentRequests = uiState.sentRequests + entity
+                            )
+                        }
                     }
                 }
             }
@@ -86,7 +90,7 @@ class FriendRequestViewModel @Inject constructor(
                             val list = state.receivedRequests.toMutableList()
                             val data = list.find { it.id == friendReqId }
                             val index = state.receivedRequests.indexOf(data)
-                            list[index] = data!!.copy( status = FriendRequestStatus.ACCEPTED.name )
+                            list[index] = data!!.copy(status = FriendRequestStatus.ACCEPTED.name)
 
                             state.copy(
                                 receivedRequests = list.toList()
@@ -162,7 +166,7 @@ class FriendRequestViewModel @Inject constructor(
                             val data = list.find { it.id == friendReqId }
                             val index = state.sentRequests.indexOf(data)
                             list[index] = data!!.copy(
-                                status = FriendRequestStatus.CANCELLED.name
+                                status = FriendRequestStatus.CANCELED.name
                             )
 
                             state.copy(
@@ -180,11 +184,11 @@ class FriendRequestViewModel @Inject constructor(
         }
     }
 
-    fun getCollectionId(userId: String): String {
-        var cid = ""
-        viewModelScope.launch {
-            cid = friendDao.getFriend(userId).first().collectionId
+    suspend fun getCollectionId(userId: String): String {
+        var a: String
+        withContext(Dispatchers.IO) {
+           a = friendDao.getCidWithUserId(userId)
         }
-        return cid
+        return a
     }
 }

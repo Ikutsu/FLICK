@@ -33,31 +33,30 @@ class NotificationService @Inject constructor(
 
     fun showChatNotification(data: MessageEntity) {
         serviceScope.launch {
-            friendDao.getFriend(data.senderUid).collect { friend ->
-                val deeplinkIntent = Intent(
-                    Intent.ACTION_VIEW,
-                    "https://flick.com/chat/${friend.username}/${friend.userId}/${friend.collectionId}".toUri(),
-                    context,
-                    MainActivity::class.java
+            val friend = friendDao.getFriend(data.senderUid).first()
+            val deeplinkIntent = Intent(
+                Intent.ACTION_VIEW,
+                "https://flick.com/chat/${friend.username}/${friend.userId}/${friend.collectionId}".toUri(),
+                context,
+                MainActivity::class.java
+            )
+            val pending: PendingIntent = TaskStackBuilder.create(context).run {
+                addNextIntentWithParentStack(deeplinkIntent)
+                getPendingIntent(
+                    0,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
-                val pending: PendingIntent = TaskStackBuilder.create(context).run {
-                    addNextIntentWithParentStack(deeplinkIntent)
-                    getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                    )
-                }
-
-                val notification = NotificationCompat.Builder(context, "flick_msg_channel")
-                    .setContentTitle(friend.username)
-                    .setContentText(data.content)
-                    .setSmallIcon(R.drawable.ic_launcher_foreground)
-                    .setPriority(NotificationCompat.PRIORITY_MAX)
-                    .setContentIntent(pending)
-                    .build()
-
-                notificationManager.notify(1, notification)
             }
+
+            val notification = NotificationCompat.Builder(context, "flick_msg_channel")
+                .setContentTitle(friend.username)
+                .setContentText(data.content)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setContentIntent(pending)
+                .build()
+
+            notificationManager.notify(1, notification)
         }
     }
 

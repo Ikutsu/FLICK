@@ -122,7 +122,7 @@ class WebSocketWorker @AssistedInject constructor(
                             notificationService.showFriendRequestNotification(friendReq)
                         }
 
-                        FriendRequestStatus.CANCELLED.name -> {
+                        FriendRequestStatus.CANCELED.name -> {
                             friendReqDao.deleteFriendReq(friendReq.id)
                         }
                     }

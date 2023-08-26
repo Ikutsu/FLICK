@@ -54,12 +54,12 @@ class WebSocketApiImpl @Inject constructor(
     }
 
     override suspend fun sendMessage(message: String): BasicResponse<String> {
-        try {
+        return try {
             webSocketSession?.send(Frame.Text(message))
-            return BasicResponse.Success()
+            BasicResponse.Success()
         } catch (e: Exception) {
             e.printStackTrace()
-            return BasicResponse.Error(e.message ?: "")
+            BasicResponse.Error(e.message ?: "")
         }
     }
 

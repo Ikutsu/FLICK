@@ -198,13 +198,12 @@ private fun ReceivedScreen(
                         FriendReqListItem(
                             name = it.senderName,
                             onClick = {
-                                val collectionId = viewModel.getCollectionId(it.senderId)
                                 runBlocking {
                                     navigator.navigate(
                                         ChatDestination(
                                             it.senderName,
                                             it.senderId,
-                                            collectionId
+                                            viewModel.getCollectionId(it.senderId)
                                         )
                                     )
                                 }
@@ -256,11 +255,11 @@ private fun SentScreen(
                 }
             ) { status ->
                 when (status) {
-                    FriendRequestStatus.CANCELLED.name -> {
+                    FriendRequestStatus.CANCELED.name -> {
                         FriendReqListItem(
                             name = it.receiverName,
                             type = FriendRequestItemType.None,
-                            infoText = FriendRequestStatus.CANCELLED.name.capitalizeFirstLetter()
+                            infoText = FriendRequestStatus.CANCELED.name.capitalizeFirstLetter()
                         )
                     }
 
@@ -288,6 +287,7 @@ private fun SentScreen(
                         )
                     }
                 }
-            }        }
+            }
+        }
     }
 }
