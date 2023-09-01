@@ -35,6 +35,7 @@ class MainActivity : ComponentActivity() {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         splashScreen.setKeepOnScreenCondition { keepOnScreenCondition }
+
         setContent {
             FLICKTheme {
                 val systemUiController = rememberSystemUiController()

@@ -22,6 +22,8 @@ data class FriendEntity(
     val latestMessage: String,
     @ColumnInfo(name = "unread_count")
     val unreadCount: Int,
+    @ColumnInfo(name = "last_read_message_time")
+    val lastReadMessageTime: Long
 )
 
 fun FriendEntity.toFriend() = Friend(

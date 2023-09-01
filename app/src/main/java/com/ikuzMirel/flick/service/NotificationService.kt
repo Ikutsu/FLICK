@@ -9,6 +9,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
 import com.ikuzMirel.flick.MainActivity
 import com.ikuzMirel.flick.R
+import com.ikuzMirel.flick.data.repositories.PreferencesRepository
 import com.ikuzMirel.flick.data.room.dao.FriendDao
 import com.ikuzMirel.flick.domain.entities.FriendRequestEntity
 import com.ikuzMirel.flick.domain.entities.FriendRequestStatus
@@ -22,7 +23,8 @@ import javax.inject.Inject
 
 class NotificationService @Inject constructor(
     private val context: Context,
-    private val friendDao: FriendDao
+    private val friendDao: FriendDao,
+    private val preferencesRepository: PreferencesRepository
 ) {
 
     private val serviceJob = SupervisorJob()
@@ -33,7 +35,8 @@ class NotificationService @Inject constructor(
 
     fun showChatNotification(data: MessageEntity) {
         serviceScope.launch {
-            val friend = friendDao.getFriend(data.senderUid).first()
+            val myUid = preferencesRepository.getValue(PreferencesRepository.USERID) ?: return@launch
+            val friend = friendDao.getFriend(data.senderUid, myUid).first()
             val deeplinkIntent = Intent(
                 Intent.ACTION_VIEW,
                 "https://flick.com/chat/${friend.username}/${friend.userId}/${friend.collectionId}".toUri(),
@@ -77,7 +80,8 @@ class NotificationService @Inject constructor(
                         Intent.ACTION_VIEW,
                         "https://flick.com/chat/${friendRequest.receiverName}/${friendRequest.receiverId}/${
                             friendDao.getFriend(
-                                friendRequest.receiverId
+                                friendRequest.receiverId,
+                                friendRequest.senderId
                             ).first().collectionId
                         }".toUri(),
                         context,

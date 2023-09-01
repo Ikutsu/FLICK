@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.ikuzMirel.flick.domain.model.Message
-import com.ikuzMirel.flick.utils.toDate
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -30,7 +29,7 @@ data class MessageEntity(
 fun MessageEntity.toMessage() = Message(
     content = content,
     userId = senderUid,
-    timestamp = timestamp.toDate(),
+    timestamp = timestamp,
     id = id,
     state = state,
     unread = unread

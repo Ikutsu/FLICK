@@ -1,7 +1,6 @@
 package com.ikuzMirel.flick.worker
 
 import android.content.Context
-import android.database.sqlite.SQLiteConstraintException
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
@@ -53,7 +52,7 @@ class SyncWorker @AssistedInject constructor(
             async {
                 fetchFriendListAndUpdateDB()
                 fetchMessagesAndUpdateDB()
-                  },
+            },
             async { fetchFriendRequestsAndUpdateDB() }
         ).all { it }
 
@@ -80,7 +79,8 @@ class SyncWorker @AssistedInject constructor(
                     collectionId = it.collectionId,
                     friendWith = userId,
                     latestMessage = "",
-                    unreadCount = 0
+                    unreadCount = 0,
+                    lastReadMessageTime = it.lastReadMessageTime
                 )
                 friendDao.upsertFriend(friendEntity)
             }
@@ -91,8 +91,8 @@ class SyncWorker @AssistedInject constructor(
 
     private suspend fun fetchMessagesAndUpdateDB(): Boolean {
         var success = false
-        val cids = friendDao.getAllFriendsCIDs().first()
         val myUserId = preferencesRepository.getValue(PreferencesRepository.USERID)!!
+        val cids = friendDao.getAllFriendsCIDs(myUserId).first()
         if (cids.isEmpty()) {
             success = true
         } else {
@@ -100,26 +100,31 @@ class SyncWorker @AssistedInject constructor(
                 val friend = friendDao.getFriendWithCID(cid).first()
                 val result = chatRepository.getChatMassages(cid).first()
                 if (result is BasicResponse.Success) {
-                    result.data?.messages?.forEach {
-                        try {
-                            if (it.senderUid == myUserId) {
-                                messageDao.insertMessage(it.toMessageEntity(unread = false))
-                            } else {
-                                messageDao.insertMessage(it.toMessageEntity(unread = true))
+                    result.data?.messages?.partition { it.senderUid == myUserId }
+                        ?.let { (sent, received) ->
+
+                            sent.forEach {
+                                messageDao.upsertMessage(it.toMessageEntity(unread = false))
                             }
-                        } catch (e: SQLiteConstraintException) {
-                            if (it.senderUid == myUserId) {
-                                messageDao.updateMessage(it.toMessageEntity(unread = false))
+
+                            received.partition { it.timestamp < friend.lastReadMessageTime }
+                                .let { (read, unread) ->
+                                    read.forEach {
+                                        messageDao.upsertMessage(it.toMessageEntity(unread = false))
+                                    }
+                                    unread.forEach {
+                                        messageDao.upsertMessage(it.toMessageEntity(unread = true))
+                                    }
+                                    friendDao.updateUnreadCount(friend.userId, unread.size)
+                                }
+                            messageDao.getLatestMessage(cid)?.let {
+                                friendDao.updateLatestMessage(
+                                    friend.userId,
+                                    it.content
+                                )
                             }
+
                         }
-                    }
-                    val latestMessage = messageDao.getLatestMessage(cid)?.content ?: ""
-                    val unreadCount = messageDao.getUnreadMessages(cid).first().size
-                    println("unreadCount: $unreadCount")
-                    friend.copy(
-                        latestMessage = latestMessage,
-                        unreadCount = unreadCount
-                    ).let { friendDao.upsertFriend(it) }
                     success = true
                 }
             }

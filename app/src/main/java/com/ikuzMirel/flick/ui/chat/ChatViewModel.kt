@@ -2,16 +2,19 @@ package com.ikuzMirel.flick.ui.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ikuzMirel.flick.data.remote.websocket.LastReadMessage
 import com.ikuzMirel.flick.data.remote.websocket.WebSocketApi
+import com.ikuzMirel.flick.data.remote.websocket.WebSocketMessage
 import com.ikuzMirel.flick.data.repositories.PreferencesRepository
 import com.ikuzMirel.flick.data.requests.SendMessageRequest
 import com.ikuzMirel.flick.data.response.BasicResponse
+import com.ikuzMirel.flick.data.room.dao.FriendDao
 import com.ikuzMirel.flick.data.room.dao.MessageDao
 import com.ikuzMirel.flick.domain.entities.toMessage
 import com.ikuzMirel.flick.domain.model.Message
 import com.ikuzMirel.flick.domain.model.MessageState
 import com.ikuzMirel.flick.domain.model.toMessageEntity
-import com.ikuzMirel.flick.utils.toDate
+import com.ikuzMirel.flick.handler.LastMessageQueueHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +32,9 @@ import javax.inject.Inject
 class ChatViewModel @Inject constructor(
     private val webSocketApi: WebSocketApi,
     private val preferencesRepository: PreferencesRepository,
-    private val messageDao: MessageDao
+    private val messageDao: MessageDao,
+    private val friendDao: FriendDao,
+    private val lastMessageQueueHandler: LastMessageQueueHandler
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<ChatUIState> = MutableStateFlow(ChatUIState())
@@ -73,19 +78,23 @@ class ChatViewModel @Inject constructor(
                     receiverId,
                     ObjectId().toString()
                 )
+                val websocketMessage = WebSocketMessage(
+                    "chatMessageRequest",
+                    request
+                )
 
                 val timestamp = System.currentTimeMillis()
                 val message = Message(
                     content,
                     _uiState.value.senderId,
-                    timestamp.toDate(),
+                    timestamp,
                     request.id,
                     MessageState.SENDING.name,
                     false
                 )
                 messageDao.upsertMessage(message.toMessageEntity(timestamp, collectionId))
 
-                val json = Json.encodeToString(request)
+                val json = Json.encodeToString(websocketMessage)
 
                 val list = uiState.value.messages.toMutableList()
                 list.add(0, message)
@@ -107,6 +116,13 @@ class ChatViewModel @Inject constructor(
                                 messages = list.toList()
                             )
                         }
+                    } else {
+                        lastMessageQueueHandler.addReadMessage(
+                            LastReadMessage(
+                                friendUserId = receiverId,
+                                lastReadMessageTime = message.timestamp
+                            )
+                        )
                     }
                 }
             }
@@ -123,8 +139,13 @@ class ChatViewModel @Inject constructor(
                 message.id
             )
 
+            val websocketMessage = WebSocketMessage(
+                "chatMessageRequest",
+                request
+            )
+
             val timestamp = System.currentTimeMillis()
-            val json = Json.encodeToString(request)
+            val json = Json.encodeToString(websocketMessage)
 
             val newMessage = message.copy(
                 state = MessageState.SENDING.name
@@ -153,14 +174,33 @@ class ChatViewModel @Inject constructor(
                             messages = list.toList()
                         )
                     }
+                } else {
+                    lastMessageQueueHandler.addReadMessage(
+                        LastReadMessage(
+                            friendUserId = receiverId,
+                            lastReadMessageTime = message.timestamp
+                        )
+                    )
                 }
             }
         }
     }
 
-    fun markMessageAsRead(id: String) {
+    fun markMessageAsRead(message: Message, receiverId: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            messageDao.updateUnreadMessages(id)
+            messageDao.updateUnreadMessages(message.id)
+            lastMessageQueueHandler.addReadMessage(
+                LastReadMessage(
+                    friendUserId = receiverId,
+                    lastReadMessageTime = message.timestamp
+                )
+            )
+        }
+    }
+
+    fun clareUnreadMessages(friendUid: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            friendDao.updateUnreadCount(friendUid, 0)
         }
     }
 }

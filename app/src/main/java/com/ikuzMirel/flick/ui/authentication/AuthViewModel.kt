@@ -11,6 +11,7 @@ import com.ikuzMirel.flick.data.repositories.PreferencesRepository
 import com.ikuzMirel.flick.data.requests.LoginRequest
 import com.ikuzMirel.flick.data.requests.SignupRequest
 import com.ikuzMirel.flick.data.response.BasicResponse
+import com.ikuzMirel.flick.worker.UnreadMessageWorker
 import com.ikuzMirel.flick.worker.WebSocketWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -196,6 +197,11 @@ class AuthViewModel @Inject constructor(
 
     fun startWorkManager() {
         workManager.apply {
+            enqueueUniquePeriodicWork(
+                UnreadMessageWorker.WORK_NAME,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+                UnreadMessageWorker.startWork()
+            )
             enqueueUniquePeriodicWork(
                 WebSocketWorker.WORK_NAME,
                 ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,

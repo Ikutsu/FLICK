@@ -10,21 +10,29 @@ import kotlinx.coroutines.flow.Flow
 interface FriendDao {
     @Upsert
     fun upsertFriend(friend: FriendEntity)
-    @Query("SELECT * FROM friends WHERE friend_with = :myUserId")
-    fun getAllFriends(myUserId: String): Flow<List<FriendEntity>>
+    @Query("SELECT * FROM friends WHERE friend_with = :userId")
+    fun getAllFriends(userId: String): Flow<List<FriendEntity>>
 
-    @Query("SELECT * FROM friends WHERE uid = :userId")
-    fun getFriend(userId: String): Flow<FriendEntity>
+    @Query("SELECT * FROM friends WHERE uid = :friendUid And friend_with = :userId")
+    fun getFriend(friendUid: String, userId: String): Flow<FriendEntity>
 
-    @Query("SELECT cid FROM friends")
-    fun getAllFriendsCIDs(): Flow<List<String>>
+    @Query("SELECT cid FROM friends WHERE friend_with = :userId")
+    fun getAllFriendsCIDs(userId: String): Flow<List<String>>
 
     @Query("SELECT * FROM friends WHERE cid = :cid")
     fun getFriendWithCID(cid: String): Flow<FriendEntity>
 
-    @Query("SELECT cid FROM friends WHERE uid = :userId")
-    fun getCidWithUserId(userId: String): String
+    @Query("SELECT cid FROM friends WHERE uid = :friendUid")
+    fun getCidWithUserId(friendUid: String): String
 
-    @Query("UPDATE friends SET unread_count = :unreadCount WHERE uid = :userId")
-    fun updateUnreadCount(userId: String, unreadCount: Int)
+    @Query("UPDATE friends SET unread_count = :unreadCount WHERE uid = :friendUid")
+    fun updateUnreadCount(friendUid: String, unreadCount: Int)
+
+    @Query("SELECT unread_count FROM friends WHERE uid = :friendUid")
+    fun getLateReadMessageTime(friendUid: String): Long
+    @Query("UPDATE friends SET last_read_message_time = :lastReadMessageTime WHERE uid = :friendUid")
+    fun updateLastReadMessageTime(friendUid: String, lastReadMessageTime: Long)
+
+    @Query("UPDATE friends SET latest_message = :latestMessage WHERE uid = :friendUid")
+    fun updateLatestMessage(friendUid: String, latestMessage: String)
 }

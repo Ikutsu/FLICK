@@ -79,6 +79,7 @@ import com.ikuzMirel.flick.ui.theme.Purple50
 import com.ikuzMirel.flick.ui.theme.Red50
 import com.ikuzMirel.flick.ui.theme.Red70
 import com.ikuzMirel.flick.ui.theme.museoRegular
+import com.ikuzMirel.flick.utils.toDate
 import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -108,6 +109,15 @@ fun Chat(
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_START) {
                 viewModel.getChatMessages(collectionId)
+                viewModel.clareUnreadMessages(userId)
+//                runBlocking {
+//                    UnreadMessageWorker.addReadMessage(
+//                        LastReadMessage(
+//                            friendUserId = state.receiverId,
+//                            lastReadMessageTime = state.messages.first().timestamp
+//                        )
+//                    )
+//                }
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -190,7 +200,7 @@ private fun Content(
             items(messages) {
                 LaunchedEffect(state.messages, true){
                     if (it.unread) {
-                        viewModel.markMessageAsRead(it.id)
+                        viewModel.markMessageAsRead(it, receiverId)
                     }
                 }
 
@@ -264,7 +274,7 @@ fun Message(
                 )
                 if (showTime) {
                     Text(
-                        text = message.timestamp,
+                        text = message.timestamp.toDate(),
                         color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 12.sp,
                         modifier = Modifier
@@ -314,7 +324,7 @@ fun Message(
                 )
                 if (showTime) {
                     Text(
-                        text = message.timestamp,
+                        text = message.timestamp.toDate(),
                         color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 12.sp,
                         modifier = Modifier

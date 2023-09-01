@@ -5,7 +5,7 @@ import com.ikuzMirel.flick.domain.entities.MessageEntity
 data class Message(
     val content: String,
     val userId: String,
-    val timestamp: String,
+    val timestamp: Long,
     val id: String,
     val state: String,
     val unread: Boolean

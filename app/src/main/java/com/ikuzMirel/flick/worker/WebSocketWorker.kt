@@ -76,8 +76,6 @@ class WebSocketWorker @AssistedInject constructor(
     private suspend fun receiveIncomingMessages() {
         val myUserId = preferencesRepository.getValue(PreferencesRepository.USERID) ?: return
         webSocketApi.receiveMessage().collect { message ->
-            println(message.type)
-            println(message.data)
             when (message.type) {
                 "chatMessage" -> {
                     val messageEntity = (message.data as MessageResponse).toMessageEntity(
@@ -109,7 +107,8 @@ class WebSocketWorker @AssistedInject constructor(
                                     collectionId = newFriend.data.collectionId,
                                     friendWith = myUserId,
                                     latestMessage = "",
-                                    unreadCount = 0
+                                    unreadCount = 0,
+                                    lastReadMessageTime = newFriend.data.lastReadMessageTime
                                 )
 
                                 friendDao.upsertFriend(friendEntity)

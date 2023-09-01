@@ -105,7 +105,8 @@ class FriendRequestViewModel @Inject constructor(
                                     collectionId = it.collectionId,
                                     friendWith = userId.value,
                                     latestMessage = "",
-                                    unreadCount = 0
+                                    unreadCount = 0,
+                                    lastReadMessageTime = 0
                                 )
                                 friendDao.upsertFriend(friendEntity)
                             }

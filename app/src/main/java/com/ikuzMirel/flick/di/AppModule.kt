@@ -17,6 +17,7 @@ import com.ikuzMirel.flick.data.remote.websocket.WebSocketApi
 import com.ikuzMirel.flick.data.remote.websocket.WebSocketApiImpl
 import com.ikuzMirel.flick.data.repositories.*
 import com.ikuzMirel.flick.data.room.dao.FriendDao
+import com.ikuzMirel.flick.handler.LastMessageQueueHandler
 import com.ikuzMirel.flick.service.NotificationService
 import dagger.Module
 import dagger.Provides
@@ -81,12 +82,19 @@ object AppModule {
     @Singleton
     fun provideNotificationService(
         @ApplicationContext context: Context,
-        friendDao: FriendDao
-    ): NotificationService = NotificationService(context, friendDao)
+        friendDao: FriendDao,
+        preferencesRepository: PreferencesRepository
+    ): NotificationService = NotificationService(context, friendDao, preferencesRepository)
 
     @Provides
     @Singleton
     fun provideWorkManager(
         @ApplicationContext context: Context
     ): WorkManager = WorkManager.getInstance(context)
+
+    @Provides
+    @Singleton
+    fun provideLastMessageQueueHandler(
+        friendDao: FriendDao
+    ): LastMessageQueueHandler = LastMessageQueueHandler(friendDao)
 }

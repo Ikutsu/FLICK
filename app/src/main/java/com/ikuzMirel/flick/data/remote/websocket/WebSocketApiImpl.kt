@@ -4,7 +4,6 @@ import android.util.Log
 import com.ikuzMirel.flick.data.constants.ENDPOINT_WEBSOCKET
 import com.ikuzMirel.flick.data.constants.WEBSOCKET_CONNECTION_ERROR
 import com.ikuzMirel.flick.data.response.BasicResponse
-import com.ikuzMirel.flick.data.response.WebSocketResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.parameter
@@ -63,14 +62,14 @@ class WebSocketApiImpl @Inject constructor(
         }
     }
 
-    override fun receiveMessage(): Flow<WebSocketResponse> =
+    override fun receiveMessage(): Flow<WebSocketMessage> =
         try {
             webSocketSession?.incoming
                 ?.receiveAsFlow()
                 ?.filter { it is Frame.Text }
                 ?.map {
                     val json = (it as? Frame.Text)?.readText().orEmpty()
-                    val message = Json.decodeFromString<WebSocketResponse>(json)
+                    val message = Json.decodeFromString<WebSocketMessage>(json)
                     message
                 }?: flow {  }
         } catch (e: Exception) {

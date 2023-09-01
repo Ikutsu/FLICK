@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 data class FriendResponse(
     val username: String,
     val userId: String,
-    val collectionId: String
+    val collectionId: String,
+    val lastReadMessageTime: Long
 )

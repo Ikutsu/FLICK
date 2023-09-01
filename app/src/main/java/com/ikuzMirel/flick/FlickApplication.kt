@@ -12,6 +12,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkManager
 import com.ikuzMirel.flick.data.repositories.PreferencesRepository
 import com.ikuzMirel.flick.worker.SyncWorker
+import com.ikuzMirel.flick.worker.UnreadMessageWorker
 import com.ikuzMirel.flick.worker.WebSocketWorker
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.runBlocking
@@ -77,6 +78,11 @@ class FlickApplication: Application(), Configuration.Provider{
                 WebSocketWorker.WORK_NAME,
                 ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
                 WebSocketWorker.startWork()
+            )
+            enqueueUniquePeriodicWork(
+                UnreadMessageWorker.WORK_NAME,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+                UnreadMessageWorker.startWork()
             )
         }
     }
