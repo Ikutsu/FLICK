@@ -22,7 +22,7 @@ android {
         minSdk = 23
         targetSdk = 33
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.0.1-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -32,7 +32,10 @@ android {
 
     buildTypes {
         release {
+            isShrinkResources = false
             isMinifyEnabled = false
+            isDebuggable = false
+
             proguardFiles (
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -45,6 +48,12 @@ android {
         create("dev") {
             initWith(getByName("debug"))
             buildConfigField("String", "ServerIP", localProperties["ServerIP"].toString())
+        }
+
+        create("prod") {
+            initWith(getByName("release"))
+            buildConfigField("String", "ServerIP", localProperties["ServerIP"].toString())
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
