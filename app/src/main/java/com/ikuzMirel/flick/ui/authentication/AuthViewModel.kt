@@ -1,5 +1,6 @@
 package com.ikuzMirel.flick.ui.authentication
 
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -211,11 +212,11 @@ class AuthViewModel @Inject constructor(
     }
 
     private fun isEmailValid() {
-        if (!_uiState.value.signUpEmail.contains("@")) {
+        if (!Patterns.EMAIL_ADDRESS.matcher(_uiState.value.signUpEmail).matches()) {
             _uiState.update {
                 it.copy(
                     emailError = true,
-                    emailErrorMessage = "Must contain @"
+                    emailErrorMessage = "This is not a valid email"
                 )
             }
         }
@@ -264,6 +265,7 @@ class AuthViewModel @Inject constructor(
     fun clearError() {
         _uiState.update {
             it.copy(
+                emailError = false,
                 usernameError = false,
                 usernameErrorMessage = "",
                 passwordError = false,
